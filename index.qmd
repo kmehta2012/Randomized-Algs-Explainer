@@ -10,15 +10,40 @@ This is the working page for your explainer. Write the article in this file, put
 
 ## Start writing here
 
-Replace this starter text with your introduction. Ordinary paragraphs are just ordinary text—there is no HTML involved.
+Imagine you're a cracked engineer living in the 70s. The best available personal computer on which you do fancy math and CS stuff has the impressive ram of 4 MB and (if we apply Moore's law) is about $\frac{1}{2^{50}}$ times slower than a personal computer right now.
 
-Inline mathematics looks like (G=(V,E)). Display mathematics gets its own block:
+You're working on some computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions. 
 
-$$
-\Pr[\text{success after } t \text{ trials}]
-= 1 - (1-p)^t.
-$$
+In particular say you have two matrices $A \text{, } B \in \mathcal{R^{d,d}}}$. If you wanted to compute the product of these two matrices in the normal, naive way that we do using pen and paper, this amounts to a time complexity of $\Theta(d^3)$.
 
+Say your matrices have dimensions (something), so doing the matrix multiplication on your own laptop will take on the order of (absurdly large) number. 
+
+So you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, $C$. Now you're a bit paranoid. You did not write the code for the supercomputer. Maybe they have some bug or maybe they have some edge case that gives some floating point error. How can you be sure $AB$ is indeed $C$?
+
+You can't compute $AB$, that was the whole point of using the supercomputer provider. What do you do then? How can you be more confident?
+
+This is essentially the matrix multiplication verification problem. Given three real-valued $d \cross d$ matrices $A, B, C$, how can you efficiently verify that $AB = C$ without recomputing $AB$ entirely yourself?
+
+Here's an idea - 
+Sample a vector $v \in \{0,1\}^n$ uniformly at random. Compute $ABv$ and $Cv$. If $ABv$ = $Cv$, we say that the $AB = C$, else we say $AB \neq C$.
+
+That's it. When I first saw this, I thought - "surely this can't work. This has to be wrong." But it does. This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions, that often make up for "how tf can this work" feelings. 
+
+For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ ABv = Cv. So this algorithm never gives a false negative. If AB is indeed equal to C, this algorithm will always work correctly. 
+
+The time complexity is also better than computing $AB$ directly. We can compute $ABv$ as $A(Bv)$. Computing $Bv$ takes $\Theta(d^2)$ time and gives us a $d \cross 1$ matrix. Multiplying $A$ with that takes $\Theta(d^2)$ time giving us an overall time complexity of \Theta(d^2). Similarly, computing $Cv$ takes $\Theta(d^2)$ time too. Thus the overall time complexity is a more respectable $\Theta(d^2)$ compared the $\Theta(d^3)$ if we try to compute $AB$ directly. 
+
+But surely this algorithm fails? What if $AB \neq C$. In this case, we can probably come up with vector $v$ s.t. that $ABv = Cv$. Yes, that's indeed the case. Here's an example:
+
+(some example)
+
+So what do we do now? 
+
+The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing : be extrememly confident, accepting a small chance that we're wrong. 
+
+Now you should be thinking in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. 
+
+So let's do this
 ## Interactive wiring check
 
 This small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.
