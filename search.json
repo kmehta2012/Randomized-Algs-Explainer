@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Randomized Algorithms",
+    "section": "",
+    "text": "This is the working page for your explainer. Write the article in this file, put mathematics inside LaTeX delimiters, and keep interactive code in the interactives folder."
+  },
+  {
+    "objectID": "index.html#start-writing-here",
+    "href": "index.html#start-writing-here",
+    "title": "Randomized Algorithms",
+    "section": "Start writing here",
+    "text": "Start writing here\nReplace this starter text with your introduction. Ordinary paragraphs are just ordinary text—there is no HTML involved.\nInline mathematics looks like (G=(V,E)). Display mathematics gets its own block:\n\n\\Pr[\\text{success after } t \\text{ trials}]\n= 1 - (1-p)^t."
+  },
+  {
+    "objectID": "index.html#interactive-wiring-check",
+    "href": "index.html#interactive-wiring-check",
+    "title": "Randomized Algorithms",
+    "section": "Interactive wiring check",
+    "text": "Interactive wiring check\nThis small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.\n\n  \n  \n    \n      Choose a random edge\n    \n    \n      Reset\n    \n  \n  No edge selected yet."
+  },
+  {
+    "objectID": "index.html#next-section",
+    "href": "index.html#next-section",
+    "title": "Randomized Algorithms",
+    "section": "Next section",
+    "text": "Next section\nContinue the explainer here. Add another heading by starting a line with ##."
+  }
+]
