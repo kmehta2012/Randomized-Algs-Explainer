@@ -27,11 +27,7 @@ The script opens the project in VS Code, prints the browser URL, and continuousl
 ./preview.sh 5050
 ```
 
-The script uses an installed `quarto` command when available. In the current
-parent workspace it can also fall back to the local Quarto installation kept
-outside this repository.
-
-To run Quarto directly from the project directory when it is installed:
+To run Quarto directly from the project directory:
 
 ```sh
 quarto preview

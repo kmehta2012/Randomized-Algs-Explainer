@@ -7,11 +7,7 @@ INDEX_FILE="${PROJECT_DIR}/index.qmd"
 PREVIEW_HOST="127.0.0.1"
 PREVIEW_PORT="${1:-4444}"
 
-if command -v quarto >/dev/null 2>&1; then
-  QUARTO_BIN="$(command -v quarto)"
-elif [[ -x "${PROJECT_DIR}/../.tools/quarto/bin/quarto" ]]; then
-  QUARTO_BIN="${PROJECT_DIR}/../.tools/quarto/bin/quarto"
-else
+if ! command -v quarto >/dev/null 2>&1; then
   printf 'Quarto was not found. Install it from https://quarto.org/docs/get-started/ or add it to your PATH.\n' >&2
   exit 1
 fi
@@ -45,7 +41,7 @@ printf '  Browser: %s\n' "${PREVIEW_URL}"
 printf '  Stop: Ctrl+C\n\n'
 
 cd "${PROJECT_DIR}"
-exec "${QUARTO_BIN}" preview \
+exec quarto preview \
   --no-browser \
   --host "${PREVIEW_HOST}" \
   --port "${PREVIEW_PORT}"
