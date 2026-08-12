@@ -1,0 +1,127 @@
+:root {
+  --article-ink: #17212b;
+  --article-muted: #586473;
+  --article-accent: #7c3aed;
+  --article-accent-dark: #5b21b6;
+  --article-accent-soft: #f3e8ff;
+  --article-border: #dfe3e8;
+  --article-panel: #f8fafc;
+}
+
+body {
+  color: var(--article-ink);
+}
+
+#quarto-content {
+  font-size: 1.08rem;
+  line-height: 1.72;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.025em;
+}
+
+.draft-note {
+  margin: 1.5rem 0 2rem;
+  padding: 1rem 1.1rem;
+  border-left: 4px solid var(--article-accent);
+  border-radius: 0 0.55rem 0.55rem 0;
+  background: var(--article-accent-soft);
+  color: #3b1d62;
+}
+
+.edge-demo {
+  margin: 1.75rem 0 2.25rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--article-border);
+  border-radius: 1rem;
+  background: var(--article-panel);
+  box-shadow: 0 14px 35px rgb(15 23 42 / 7%);
+}
+
+.edge-demo__canvas {
+  overflow: hidden;
+  border: 1px solid var(--article-border);
+  border-radius: 0.75rem;
+  background: white;
+}
+
+.edge-demo__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 240px;
+}
+
+.edge-demo__edge {
+  stroke: #94a3b8;
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke 160ms ease, stroke-width 160ms ease;
+}
+
+.edge-demo__edge.is-selected {
+  stroke: var(--article-accent);
+  stroke-width: 11;
+}
+
+.edge-demo__node {
+  fill: white;
+  stroke: var(--article-ink);
+  stroke-width: 4;
+}
+
+.edge-demo__label {
+  fill: var(--article-ink);
+  font: 700 22px/1 system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.edge-demo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.edge-demo__button {
+  padding: 0.68rem 1rem;
+  border: 1px solid var(--article-accent);
+  border-radius: 999px;
+  background: var(--article-accent);
+  color: white;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.edge-demo__button:hover {
+  border-color: var(--article-accent-dark);
+  background: var(--article-accent-dark);
+}
+
+.edge-demo__button:focus-visible {
+  outline: 3px solid rgb(124 58 237 / 30%);
+  outline-offset: 3px;
+}
+
+.edge-demo__button--secondary {
+  background: white;
+  color: var(--article-accent-dark);
+}
+
+.edge-demo__button--secondary:hover {
+  background: var(--article-accent-soft);
+  color: var(--article-accent-dark);
+}
+
+.edge-demo__status {
+  min-height: 1.6em;
+  margin: 0.85rem 0 0;
+  color: var(--article-muted);
+  font-size: 0.96rem;
+}

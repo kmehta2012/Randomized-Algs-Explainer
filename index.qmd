@@ -1,0 +1,45 @@
+---
+title: "Randomized Algorithms"
+subtitle: "An interactive explainer — working draft"
+author: "Karan Mehta"
+---
+
+::: {.draft-note}
+This is the working page for your explainer. Write the article in this file, put mathematics inside LaTeX delimiters, and keep interactive code in the `interactives` folder.
+:::
+
+## Start writing here
+
+Replace this starter text with your introduction. Ordinary paragraphs are just ordinary text—there is no HTML involved.
+
+Inline mathematics looks like (G=(V,E)). Display mathematics gets its own block:
+
+$$
+\Pr[\text{success after } t \text{ trials}]
+= 1 - (1-p)^t.
+$$
+
+## Interactive wiring check
+
+This small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.
+
+```{=html}
+<div class="edge-demo" data-random-edge-demo>
+  <div class="edge-demo__canvas" aria-label="A sample graph with four vertices"></div>
+  <div class="edge-demo__controls">
+    <button class="edge-demo__button" type="button" data-action="choose">
+      Choose a random edge
+    </button>
+    <button class="edge-demo__button edge-demo__button--secondary" type="button" data-action="reset">
+      Reset
+    </button>
+  </div>
+  <p class="edge-demo__status" aria-live="polite">No edge selected yet.</p>
+</div>
+
+<script type="module" src="interactives/random-edge-demo.js"></script>
+```
+
+## Next section
+
+Continue the explainer here. Add another heading by starting a line with `##`.

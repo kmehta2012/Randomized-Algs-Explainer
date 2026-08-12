@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - interactives/**
+
+website:
+  title: "Randomized Algorithms"
+  navbar: false
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-title: "On this page"
+    smooth-scroll: true
+    anchor-sections: true
+    html-math-method: katex
+
+editor:
+  render-on-save: true

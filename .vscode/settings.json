@@ -1,0 +1,6 @@
+{
+  "quarto.render.previewType": "internal",
+  "quarto.render.renderOnSave": true,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 900
+}
