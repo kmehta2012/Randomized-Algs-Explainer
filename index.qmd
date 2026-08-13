@@ -32,7 +32,7 @@ Given three real-valued matrices $A, B, C \in \mathbb{R}^{d \times d}$, determin
 
 How can you solve this problem? The only way to be absolutely sure is to compute $AB$ yourself and compare it with C. But the impracticality of doing so was the whole point of using the supercomputer provider. What do you do then? How can you be more confident?
 
-Here's an idea -
+Here's an algorithm idea -
  
 ::: {#algorithm-freivalds .algorithm-statement}
 
@@ -44,13 +44,15 @@ Here's an idea -
 
 :::
 
-That's it. When I first saw this, I thought - "surely this can't work. This has to be wrong." But it does. This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions, that often make up for "how tf can this work" feelings. 
+That's it. I want to emphasize the simplicity of this algorithm. For a seemingly complicated problem with significant challenges, we've proposed a 3 step algorithm. When I first encountered this algorithm in my studies, I thought to myself "surely this can't work. This has to be wrong." But it does. This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions. You'll have this "how tf can this work" feeling again and again, and that's why these are my favourite class of algorithms. 
+
+Let's unpack this. 
 
 For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ ABv = Cv. So this algorithm never gives a false negative. If AB is indeed equal to C, this algorithm will always work correctly. 
 
-The time complexity is also better than computing $AB$ directly. We can compute $ABv$ as $A(Bv)$. Computing $Bv$ takes $\Theta(d^2)$ time and gives us a $d \cross 1$ matrix. Multiplying $A$ with that takes $\Theta(d^2)$ time giving us an overall time complexity of \Theta(d^2). Similarly, computing $Cv$ takes $\Theta(d^2)$ time too. Thus the overall time complexity is a more respectable $\Theta(d^2)$ compared the $\Theta(d^3)$ if we try to compute $AB$ directly. 
+The time complexity is also better than computing $AB$ directly. We can compute $ABv$ as $A(Bv)$. Computing $Bv$ takes $\Theta(d^2)$ time and gives us a $d \times 1$ matrix. Multiplying $A$ with that takes $\Theta(d^2)$ time giving us an overall time complexity of $\Theta(d^2)$. Similarly, computing $Cv$ takes $\Theta(d^2)$ time too. Thus the overall time complexity is a more respectable $\Theta(d^2)$ compared the $\Theta(d^3)$ if we try to compute $AB$ directly. 
 
-But surely this algorithm fails? What if $AB \neq C$. In this case, we can probably come up with vector $v$ s.t. that $ABv = Cv$. Yes, that's indeed the case. Here's an example:
+But surely this algorithm fails? What if $AB \neq C$. In this case, we can probably come up with vector $v$ such that that $ABv = Cv$. Yes, that's indeed the case. Here's an example:
 
 (some example)
 
@@ -58,7 +60,7 @@ So what do we do now?
 
 The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing : be extrememly confident, accepting a small chance that we're wrong. 
 
-Now you should be thinking in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let's do this:
+This is our cue to think in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let's analyse this:
 
 $$
 
