@@ -1,31 +1,48 @@
 ---
-title: "Randomized Algorithms"
-subtitle: "An interactive explainer — working draft"
-author: "Karan Mehta"
+title: "An introduction to Randomized Algorithms"
 ---
 
-::: {.draft-note}
-This is the working page for your explainer. Write the article in this file, put mathematics inside LaTeX delimiters, and keep interactive code in the `interactives` folder.
+# Introduction
+
+# Problem: Verifying matrix multiplication
+
+Imagine you're a cracked engineer living in the 80s. The best available personal computer on which carry out your fancy math computations has an impressive ram of 4 MB and (if we apply Moore's law) is about $500,000$ times slower than a personal computer right now.
+
+You're working on a computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions. 
+
+In particular, say you have two matrices $A \text{, } B \in \mathbb{R^{d \times d}}$ and you want to compute $AB$. If we use the naive pen and paper method of computing matrix multiplication, this amounts to $\Theta(d^3)$ amount of work.
+
+Say your matrices have dimensions (something), so doing the matrix multiplication on your own computer will take on the order of (absurdly large number) . 
+
+Realizing the impracticality, you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, $C$. 
+
+Now you're a bit paranoid. You did not write the code for the supercomputer. Maybe their code has a subtle bug that got exposed on your massive matrix multiplication load. How can you be sure $AB$ is indeed $C$?
+
+This is what we call the *matrix multiplication verification problem (MMV)*. 
+
+Here it is stated more formally:
+
+::: {#mvp .problem-statement}
+
+[Matrix Multiplication Verification (MMV)]{.problem-title}
+
+Given three real-valued matrices $A, B, C \in \mathbb{R}^{d \times d}$, determine whether $AB = C$.
+
 :::
 
-## Start writing here
+How can you solve this problem? The only way to be absolutely sure is to compute $AB$ yourself and compare it with C. But the impracticality of doing so was the whole point of using the supercomputer provider. What do you do then? How can you be more confident?
 
-Imagine you're a cracked engineer living in the 70s. The best available personal computer on which you do fancy math and CS stuff has the impressive ram of 4 MB and (if we apply Moore's law) is about $\frac{1}{2^{50}}$ times slower than a personal computer right now.
+Here's an idea -
+ 
+::: {#algorithm-freivalds .algorithm-statement}
 
-You're working on some computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions. 
+[Freivalds' Algorithm]{.algorithm-title}
 
-In particular say you have two matrices $A \text{, } B \in \mathcal{R^{d,d}}}$. If you wanted to compute the product of these two matrices in the normal, naive way that we do using pen and paper, this amounts to a time complexity of $\Theta(d^3)$.
+1. Sample a vector $v \in \{0,1\}^n$ uniformly at random.
+2. Compute $ABv$ and $Cv$.
+3. If $ABv$ = $Cv$, we say that the $AB = C$, else we say $AB \neq C$.
 
-Say your matrices have dimensions (something), so doing the matrix multiplication on your own laptop will take on the order of (absurdly large) number. 
-
-So you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, $C$. Now you're a bit paranoid. You did not write the code for the supercomputer. Maybe they have some bug or maybe they have some edge case that gives some floating point error. How can you be sure $AB$ is indeed $C$?
-
-You can't compute $AB$, that was the whole point of using the supercomputer provider. What do you do then? How can you be more confident?
-
-This is essentially the matrix multiplication verification problem. Given three real-valued $d \cross d$ matrices $A, B, C$, how can you efficiently verify that $AB = C$ without recomputing $AB$ entirely yourself?
-
-Here's an idea - 
-Sample a vector $v \in \{0,1\}^n$ uniformly at random. Compute $ABv$ and $Cv$. If $ABv$ = $Cv$, we say that the $AB = C$, else we say $AB \neq C$.
+:::
 
 That's it. When I first saw this, I thought - "surely this can't work. This has to be wrong." But it does. This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions, that often make up for "how tf can this work" feelings. 
 
@@ -41,9 +58,15 @@ So what do we do now?
 
 The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing : be extrememly confident, accepting a small chance that we're wrong. 
 
-Now you should be thinking in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. 
+Now you should be thinking in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let's do this:
 
-So let's do this
+$$
+
+$$
+
+
+
+
 ## Interactive wiring check
 
 This small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.

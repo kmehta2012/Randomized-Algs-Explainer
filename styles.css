@@ -6,6 +6,12 @@
   --article-accent-soft: #f3e8ff;
   --article-border: #dfe3e8;
   --article-panel: #f8fafc;
+  --problem-background: #fff9e6;
+  --problem-border: #d8cfa8;
+  --problem-accent: #9a6b16;
+  --algorithm-background: #f1f4f5;
+  --algorithm-border: #c6ced1;
+  --algorithm-accent: #465a63;
 }
 
 body {
@@ -13,6 +19,7 @@ body {
 }
 
 #quarto-content {
+  counter-reset: problem algorithm;
   font-size: 1.08rem;
   line-height: 1.72;
 }
@@ -30,6 +37,78 @@ h3 {
   border-radius: 0 0.55rem 0.55rem 0;
   background: var(--article-accent-soft);
   color: #3b1d62;
+}
+
+.problem-statement {
+  counter-increment: problem;
+  scroll-margin-top: 1.5rem;
+  margin: 1.75rem 0 2rem;
+  padding: 1.2rem 1.35rem;
+  border: 1px solid var(--problem-border);
+  border-left: 4px solid var(--problem-accent);
+  border-radius: 0.25rem;
+  background: var(--problem-background);
+  color: #202020;
+}
+
+.problem-statement > :first-child {
+  margin-top: 0;
+}
+
+.problem-statement > :last-child {
+  margin-bottom: 0;
+}
+
+.problem-title {
+  display: block;
+  font-size: 1.12rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.problem-title::before {
+  content: "Problem " counter(problem) ": ";
+}
+
+.problem-statement:target {
+  outline: 2px solid rgb(154 107 22 / 35%);
+  outline-offset: 3px;
+}
+
+.algorithm-statement {
+  counter-increment: algorithm;
+  scroll-margin-top: 1.5rem;
+  margin: 1.75rem 0 2rem;
+  padding: 1.2rem 1.35rem;
+  border: 1px solid var(--algorithm-border);
+  border-left: 4px solid var(--algorithm-accent);
+  border-radius: 0.25rem;
+  background: var(--algorithm-background);
+  color: #202427;
+}
+
+.algorithm-statement > :first-child {
+  margin-top: 0;
+}
+
+.algorithm-statement > :last-child {
+  margin-bottom: 0;
+}
+
+.algorithm-title {
+  display: block;
+  font-size: 1.12rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.algorithm-title::before {
+  content: "Algorithm " counter(algorithm) ": ";
+}
+
+.algorithm-statement:target {
+  outline: 2px solid rgb(70 90 99 / 35%);
+  outline-offset: 3px;
 }
 
 .edge-demo {
