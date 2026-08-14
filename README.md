@@ -37,3 +37,15 @@ quarto render
 Rendered website files are written to `_site/`. That generated directory is
 intentionally excluded from Git; `quarto publish gh-pages` renders and publishes
 the site to the `gh-pages` branch.
+
+## Graph visualization design decision
+
+Use D3.js with SVG as the default system for the explainer's small graph
+visuals. The same renderer should support non-interactive diagrams, interactive
+elements, and animated algorithm steps. Prefer deliberately fixed node
+positions for explanatory figures so animations such as Karger contractions
+remain visually stable and precisely choreographed.
+
+Cytoscape.js may be reconsidered if a later visual needs graph-native layouts or
+exploration controls that would be costly to build with D3. Sigma.js is not a
+default dependency because its large-graph WebGL focus is unnecessary here.

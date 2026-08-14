@@ -48,13 +48,81 @@ That's it. I want to emphasize the simplicity of this algorithm. For a seemingly
 
 Let's unpack this. 
 
-For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ ABv = Cv. So this algorithm never gives a false negative. If AB is indeed equal to C, this algorithm will always work correctly. 
+For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ $ABv = Cv$. So this algorithm never gives a false negative. If $AB$ is indeed equal to $C$, this algorithm will always work correctly. 
 
 The time complexity is also better than computing $AB$ directly. We can compute $ABv$ as $A(Bv)$. Computing $Bv$ takes $\Theta(d^2)$ time and gives us a $d \times 1$ matrix. Multiplying $A$ with that takes $\Theta(d^2)$ time giving us an overall time complexity of $\Theta(d^2)$. Similarly, computing $Cv$ takes $\Theta(d^2)$ time too. Thus the overall time complexity is a more respectable $\Theta(d^2)$ compared the $\Theta(d^3)$ if we try to compute $AB$ directly. 
 
 But surely this algorithm fails? What if $AB \neq C$. In this case, we can probably come up with vector $v$ such that that $ABv = Cv$. Yes, that's indeed the case. Here's an example:
 
-(some example)
+::: {#example-freivalds-misleading-agreement}
+
+$$
+\begin{aligned}
+A &=
+\begin{pmatrix}
+1 & 1 \\
+0 & 1
+\end{pmatrix},
+\\
+B &=
+\begin{pmatrix}
+1 & 0 \\
+1 & 1
+\end{pmatrix}, \\
+C &=
+\begin{pmatrix}
+1 & 2 \\
+1 & 1
+\end{pmatrix}.
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+AB
+  &=
+  \begin{pmatrix}
+  2 & 1 \\
+  1 & 1
+  \end{pmatrix}
+  \neq C, \\
+v^{(1)}
+  &=
+  \begin{pmatrix}
+  1 \\
+  1
+  \end{pmatrix}.
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+Bv^{(1)}
+  &=
+  \begin{pmatrix}
+  1 \\
+  2
+  \end{pmatrix}, \\
+A\bigl(Bv^{(1)}\bigr)
+  &=
+  \begin{pmatrix}
+  3 \\
+  2
+  \end{pmatrix}, \\
+Cv^{(1)}
+  &=
+  \begin{pmatrix}
+  3 \\
+  2
+  \end{pmatrix}.
+\end{aligned}
+$$
+
+$$
+ABv^{(1)}=Cv^{(1)}.
+$$
+
+:::
 
 So what do we do now? 
 
@@ -62,34 +130,245 @@ The key is to remember that we want to be more *confident* about whether $AB = C
 
 This is our cue to think in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let's analyse this:
 
-$$
+Let $D = AB-C$. Thus $D=0 \Leftrightarrow AB=C$.
+
+Since the algorithm only fails when $D \neq 0$ and we sample $v \in \{0,1\}^d$ s.t. $Dv=0$, we find the prob. of sampling such a vector $v$.
+
+Let $r_k$ be the $k^{\text{th}}$ entry of the $d \times 1$ matrix $Dv$.
 
 $$
+\begin{aligned}
+P[\text{Failure}]
+  &= P[Dv=0] \\
+  &= P[r_1=0 \cap r_2=0 \cap \cdots \cap r_d=0] \\
+  &\leq P[r_j=0], \quad \text{for any } j \in \{1,2,\ldots,d\}
+\end{aligned}
+$$ {#eq-freivalds-failure-coordinate}
+
+Since $D \neq 0$, there is atleast one non-zero entry in $D$. Say the $(i,j)^{\text{th}}$ entry, denoted by $D_{i,j}$, is non-zero.
+
+By definition of matrix multiplication:
+
+$$
+r_i = \sum_{k=1}^{d} D_{i,k}v_k = D_{i,j}v_j+y, \quad \text{where } y \in \mathbb{R}
+$$
+
+Let's compute the Probability that $r_i=0$.
+
+Since $y$ could be either zero or non-zero. We can condition over that and use the law of total probability to get:
+
+$$
+\begin{aligned}
+P[r_i=0]
+  &= P[(y \neq 0 \cap r_i=0) \cup (y=0 \cap r_i=0)] \\
+  &= P[r_i=0 \mid y \neq 0]P[y \neq 0] + P[r_i=0 \mid y=0]P[y=0]
+\end{aligned}
+$$ {#eq-freivalds-total-probability}
+
+$$
+P[r_i=0 \mid y=0] = P\left[v_j=-\frac{y}{D_{i,j}}\right]P[y=0]
+$$
+
+Since $-\frac{y}{D_{i,j}} \in \mathbb{R}$ and $v_j \in \{0,1\}$;
+
+$$
+P\left[v_j=-\frac{y}{D_{i,j}}\right] \leq \frac{1}{2}
+$$
+
+Thus,
+
+$$
+P[r_i=0 \mid y=0] \leq \frac{1}{2}P[y=0]
+$$ {#eq-freivalds-first-case}
+
+$$
+P[r_i=0 \mid y=0] = P[v_j=0] = \frac{1}{2}
+$$ {#eq-freivalds-second-case}
+
+Substituting @eq-freivalds-first-case and @eq-freivalds-second-case into @eq-freivalds-total-probability, we get:
+
+$$
+\begin{aligned}
+P[r_i=0]
+  &\leq \frac{1}{2}P[y \neq 0] + \frac{1}{2}P[y=0] \\
+  &= \frac{1}{2}\left[P[y \neq 0] + P[y=0]\right] \\
+  &= \frac{1}{2}
+\end{aligned}
+$$
+
+From @eq-freivalds-failure-coordinate:
+
+$$
+P[\text{Failure}] \leq P[r_i=0] = \frac{1}{2}
+$$
+
+Thus
+
+$$
+\boxed{P[\text{Failure}] \leq \frac{1}{2}}
+$$
+
+# Problem 2 : Min-Cut of a graph
+
+You’re a computer network administrator and you’ve been tasked by your company to check its computer network for risks that may make it unavailable to users.
+
+Here’s a visual of the computer network you’re managing:
+
+(a visual of a computer network)
+
+Each network node represents a computer, and the lines between each network node can be thought of as wires connecting them. In particular, any two nodes A and B in the network are connected and reachable to each other if there is a path of wires that leads us from A to B. 
+
+One metric we care about is how resistant our network’s connectivity is to damaged wires. In particular, what’s the smallest number of wires that, if they get damaged, would make the network unconnected?
+
+If we think of our computer network as a graph, with the network nodes being vertices and the wires being edges, this metric amounts to finding the minimum cut of the graph. 
+
+Let’s define what a cut is:
 
 
+::: {#definition-cut .definition-statement}
 
+[Cut]{.definition-title}
 
-## Interactive wiring check
+A cut $C = (S, T)$ of a graph $G(V, E)$ is a partition of the vertices into two disjoint non-empty subsets $S \subset V$ and $T = V \setminus S$.
 
-This small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.
+:::
+
+::: {#definition-cut-size .definition-statement}
+
+[Size of a Cut]{.definition-title}
+
+The size of a cut $C = (S, T)$ is defined as the number of edges $e = (u,v) \in E$ such that $u \in S$ and $v \in T$  
+
+:::
+
+These definitions can feel convoluted without any visuals. Look at the visual below (will add some explanation here for the visuals).
 
 ```{=html}
-<div class="edge-demo" data-random-edge-demo>
-  <div class="edge-demo__canvas" aria-label="A sample graph with four vertices"></div>
-  <div class="edge-demo__controls">
-    <button class="edge-demo__button" type="button" data-action="choose">
-      Choose a random edge
+<div class="karger-cuts" data-karger-cut-examples>
+  <ul class="karger-cuts__legend" aria-label="Cut diagram legend">
+    <li><span class="karger-cuts__legend-node is-set-s" aria-hidden="true"></span>Vertex in S</li>
+    <li><span class="karger-cuts__legend-node is-set-t" aria-hidden="true"></span>Vertex in T</li>
+    <li><span class="karger-cuts__legend-line is-cut-edge" aria-hidden="true"></span>Edge in cut</li>
+    <li><span class="karger-cuts__legend-line is-cut-boundary" aria-hidden="true"></span>Cut boundary</li>
+  </ul>
+
+  <div class="karger-cuts__grid">
+    <figure id="cut-example-a" class="karger-cuts__figure" data-cut-id="A">
+      <figcaption class="karger-cuts__caption">Cut A <span aria-hidden="true">·</span> size 3</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas></div>
+    </figure>
+
+    <figure id="cut-example-b" class="karger-cuts__figure" data-cut-id="B">
+      <figcaption class="karger-cuts__caption">Cut B <span aria-hidden="true">·</span> size 4</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas></div>
+    </figure>
+
+    <figure id="cut-example-c" class="karger-cuts__figure" data-cut-id="C">
+      <figcaption class="karger-cuts__caption">Cut C <span aria-hidden="true">·</span> size 5</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas></div>
+    </figure>
+
+    <figure id="cut-example-d" class="karger-cuts__figure" data-cut-id="D">
+      <figcaption class="karger-cuts__caption">Cut D <span aria-hidden="true">·</span> size 2</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas></div>
+    </figure>
+  </div>
+</div>
+
+<script type="module" src="interactives/karger-cut-examples.js"></script>
+```
+
+Now that we understand what a cut is, we can formally state the min-cut problem:
+
+(formally state the problem)
+
+(A visual for a graph that highlightes the min cut and states the size for that. I need to think about this graph becasue I'll use this for all the future karger visuals.)
+
+There are several deterministic algorithms that can always find the min-cut of a graph. If you've ever read them (for example the one based on finding the max-flow), you'd know those algorithms tend to be really complicated. Randomization, on the other hand, gives us a really simple and elegant algorithm. 
+
+Before I share this algorithm we need to define what it means to *contract* an edge. Here's the formal definition
+
+::: {#definition-edge-contraction .definition-statement}
+
+[Edge Contraction]{.definition-title}
+
+(Definition of edge contraction goes here.)
+
+:::
+
+```{=html}
+<div class="edge-contraction" data-edge-contraction-demo>
+  <div class="edge-contraction__stage">
+    <figure class="edge-contraction__figure">
+      <figcaption class="edge-contraction__figure-title">Original graph</figcaption>
+      <div class="edge-contraction__canvas" data-role="original-graph"></div>
+    </figure>
+
+    <div class="edge-contraction__transition" data-role="transition-stage">
+      <div class="edge-contraction__transition-title" data-role="transition-title">
+        Contract A–C
+      </div>
+      <div class="edge-contraction__arrow" data-role="transition-arrow"></div>
+    </div>
+
+    <figure class="edge-contraction__figure">
+      <figcaption class="edge-contraction__figure-title">Contracted graph</figcaption>
+      <div class="edge-contraction__canvas" data-role="contracted-graph"></div>
+    </figure>
+  </div>
+
+  <div class="edge-contraction__controls">
+    <label class="edge-contraction__field">
+      <span>Edge to contract</span>
+      <select data-role="edge-select">
+        <option value="AC" selected>A–C (diagonal)</option>
+        <option value="AB">A–B (top)</option>
+        <option value="BC">B–C (right)</option>
+        <option value="CD">C–D (bottom)</option>
+        <option value="DA">D–A (left)</option>
+      </select>
+    </label>
+    <button class="edge-contraction__button edge-contraction__button--primary" type="button" data-action="run">
+      Run contraction
     </button>
-    <button class="edge-demo__button edge-demo__button--secondary" type="button" data-action="reset">
+    <button class="edge-contraction__button" type="button" data-action="reset">
       Reset
     </button>
   </div>
-  <p class="edge-demo__status" aria-live="polite">No edge selected yet.</p>
+
+  <p class="edge-contraction__status" data-role="status" aria-live="polite">
+    Diagonal edge A–C is selected.
+  </p>
 </div>
 
-<script type="module" src="interactives/random-edge-demo.js"></script>
+<script type="module" src="interactives/edge-contraction-demo.js"></script>
 ```
 
-## Next section
+Now we've all the machinery needed to state our randomized algorithm
 
-Continue the explainer here. Add another heading by starting a line with `##`.
+(define Karger's Algorithm)
+
+That's it. Does this algorithm always work correctly? Ofcourse not. For the graph G in (previous visual), here are two possible iterations of Karger's algorithm
+
+```{=html}
+<div class="karger-runs" data-karger-run-comparison>
+  <div class="karger-runs__stage" data-role="run-stage"></div>
+
+  <div class="karger-runs__controls">
+    <button class="karger-runs__replay" type="button" data-action="replay">
+      Replay
+    </button>
+  </div>
+
+  <p class="karger-runs__status" data-role="status" aria-live="polite">
+    The two Karger executions are ready to play.
+  </p>
+</div>
+
+<script type="module" src="interactives/karger-run-comparison.js"></script>
+```
+
+It is important to observe two things:
+
+1. Any cut in a later graph, is a cut in our original graph
+2. The algorithm fails precisely 

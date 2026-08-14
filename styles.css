@@ -12,6 +12,9 @@
   --algorithm-background: #f1f4f5;
   --algorithm-border: #c6ced1;
   --algorithm-accent: #465a63;
+  --definition-background: #f3f6f1;
+  --definition-border: #cbd5c6;
+  --definition-accent: #596b52;
 }
 
 body {
@@ -19,7 +22,7 @@ body {
 }
 
 #quarto-content {
-  counter-reset: problem algorithm;
+  counter-reset: problem algorithm definition;
   font-size: 1.08rem;
   line-height: 1.72;
 }
@@ -108,6 +111,42 @@ h3 {
 
 .algorithm-statement:target {
   outline: 2px solid rgb(70 90 99 / 35%);
+  outline-offset: 3px;
+}
+
+.definition-statement {
+  counter-increment: definition;
+  scroll-margin-top: 1.5rem;
+  margin: 1.75rem 0 2rem;
+  padding: 1.2rem 1.35rem;
+  border: 1px solid var(--definition-border);
+  border-left: 4px solid var(--definition-accent);
+  border-radius: 0.25rem;
+  background: var(--definition-background);
+  color: #202420;
+}
+
+.definition-statement > :first-child {
+  margin-top: 0;
+}
+
+.definition-statement > :last-child {
+  margin-bottom: 0;
+}
+
+.definition-title {
+  display: block;
+  font-size: 1.12rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.definition-title::before {
+  content: "Definition " counter(definition) ": ";
+}
+
+.definition-statement:target {
+  outline: 2px solid rgb(89 107 82 / 35%);
   outline-offset: 3px;
 }
 
@@ -203,4 +242,829 @@ h3 {
   margin: 0.85rem 0 0;
   color: var(--article-muted);
   font-size: 0.96rem;
+}
+
+.edge-contraction {
+  --contraction-ink: #202020;
+  --contraction-muted: #6f695e;
+  --contraction-structure: #817b70;
+
+  margin: 1.75rem 0 2.25rem;
+  padding: 1.25rem 0 1rem;
+  border-top: 1px solid var(--problem-border);
+  border-bottom: 1px solid var(--problem-border);
+  color: var(--contraction-ink);
+}
+
+.edge-contraction__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, 0.38fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 2.5vw, 1.5rem);
+  align-items: center;
+}
+
+.edge-contraction__figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.edge-contraction__figure-title,
+.edge-contraction__transition-title {
+  margin-bottom: 0.35rem;
+  color: var(--contraction-ink);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.edge-contraction__canvas {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+}
+
+.edge-contraction__canvas svg,
+.edge-contraction__arrow svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.edge-contraction__transition {
+  min-width: 0;
+  text-align: center;
+}
+
+.edge-contraction__arrow {
+  width: 100%;
+  max-width: 9rem;
+  margin-inline: auto;
+}
+
+.edge-contraction__edge {
+  fill: none;
+  stroke: var(--contraction-structure);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edge-contraction__edge.is-selected {
+  stroke: var(--problem-accent);
+  stroke-width: 6;
+}
+
+.edge-contraction__node {
+  fill: white;
+  stroke: var(--contraction-ink);
+  stroke-width: 3;
+}
+
+.edge-contraction__node.is-selected {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 4;
+}
+
+.edge-contraction__result-node.is-supernode .edge-contraction__node {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 4;
+}
+
+.edge-contraction__label,
+.edge-contraction__mini-label,
+.edge-contraction__mini-supernode-label {
+  fill: var(--contraction-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.edge-contraction__label {
+  font-size: 18px;
+}
+
+.edge-contraction__label--inside,
+.edge-contraction__mini-label,
+.edge-contraction__mini-supernode-label {
+  dominant-baseline: central;
+}
+
+.edge-contraction__label--inside {
+  font-size: 15px;
+}
+
+.edge-contraction__arrow-track {
+  stroke: var(--problem-border);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.edge-contraction__arrow-progress,
+.edge-contraction__mini-edge {
+  stroke: var(--problem-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.edge-contraction__arrowhead {
+  fill: var(--problem-accent);
+}
+
+.edge-contraction__mini-node {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 3;
+}
+
+.edge-contraction__mini-supernode {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 3;
+}
+
+.edge-contraction__mini-label,
+.edge-contraction__mini-supernode-label {
+  font-size: 11px;
+}
+
+.edge-contraction__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--problem-border);
+}
+
+.edge-contraction__field {
+  display: grid;
+  gap: 0.3rem;
+  min-width: min(14rem, 100%);
+  color: var(--contraction-ink);
+  font-size: 0.94rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.edge-contraction__field select,
+.edge-contraction__button {
+  min-height: 2.6rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--problem-border);
+  border-radius: 0.25rem;
+  font: inherit;
+}
+
+.edge-contraction__field select {
+  background: white;
+  color: var(--contraction-ink);
+}
+
+.edge-contraction__button {
+  background: white;
+  color: var(--contraction-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.edge-contraction__button--primary {
+  border-color: var(--contraction-ink);
+  background: var(--contraction-ink);
+  color: white;
+}
+
+.edge-contraction__button:hover:not(:disabled),
+.edge-contraction__field select:hover:not(:disabled) {
+  border-color: var(--problem-accent);
+  background: var(--problem-background);
+}
+
+.edge-contraction__button--primary:hover:not(:disabled) {
+  border-color: var(--problem-accent);
+  background: #34312c;
+  color: white;
+}
+
+.edge-contraction__field select:focus-visible,
+.edge-contraction__button:focus-visible {
+  outline: 3px solid var(--problem-accent);
+  outline-offset: 2px;
+}
+
+.edge-contraction__field select:disabled,
+.edge-contraction__button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.edge-contraction__status {
+  min-height: 1.5em;
+  margin: 0.75rem 0 0;
+  color: var(--contraction-muted);
+  font-size: 0.94rem;
+}
+
+@media (max-width: 680px) {
+  .edge-contraction__stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .edge-contraction__canvas {
+    width: min(100%, 21rem);
+    margin-inline: auto;
+  }
+
+  .edge-contraction__transition {
+    width: min(100%, 10rem);
+    margin-inline: auto;
+  }
+
+  .edge-contraction__arrow-track,
+  .edge-contraction__arrow-progress {
+    display: none;
+  }
+
+  .edge-contraction__transition::after {
+    display: block;
+    margin-top: -0.25rem;
+    color: var(--problem-accent);
+    font-size: 1.75rem;
+    line-height: 1;
+    content: "↓";
+  }
+
+  .edge-contraction__controls {
+    align-items: stretch;
+  }
+
+  .edge-contraction__field {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edge-contraction *,
+  .edge-contraction *::before,
+  .edge-contraction *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.karger-cuts {
+  --karger-cuts-ink: #202020;
+  --karger-cuts-muted: #6f695e;
+  --karger-cuts-edge: #817b70;
+
+  margin: 1.75rem 0 2.25rem;
+  padding: 1.1rem 0 1.25rem;
+  border-top: 1px solid var(--problem-border);
+  border-bottom: 1px solid var(--problem-border);
+  color: var(--karger-cuts-ink);
+}
+
+.karger-cuts__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.25rem;
+  justify-content: center;
+  margin: 0 0 1.1rem;
+  padding: 0;
+  color: var(--karger-cuts-muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  list-style: none;
+}
+
+.karger-cuts__legend li {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.karger-cuts__legend-node {
+  display: inline-block;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-style: solid;
+  border-radius: 50%;
+}
+
+.karger-cuts__legend-node.is-set-s {
+  border-color: var(--problem-accent);
+  border-width: 3px;
+  background: var(--problem-background);
+}
+
+.karger-cuts__legend-node.is-set-t {
+  border-color: var(--algorithm-accent);
+  border-width: 2px;
+  background: var(--algorithm-background);
+}
+
+.karger-cuts__legend-line {
+  display: inline-block;
+  width: 2rem;
+  height: 0;
+}
+
+.karger-cuts__legend-line.is-cut-edge {
+  border-top: 5px solid var(--problem-accent);
+}
+
+.karger-cuts__legend-line.is-cut-boundary {
+  border-top: 2px dashed var(--karger-cuts-ink);
+}
+
+.karger-cuts__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem clamp(1rem, 3vw, 2rem);
+}
+
+.karger-cuts__figure {
+  min-width: 0;
+  scroll-margin-top: 1.5rem;
+  margin: 0;
+}
+
+.karger-cuts__figure:target {
+  outline: 2px solid var(--problem-accent);
+  outline-offset: 4px;
+}
+
+.karger-cuts__caption {
+  margin-bottom: 0.3rem;
+  color: var(--karger-cuts-ink);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.karger-cuts__canvas {
+  width: 100%;
+  aspect-ratio: 36 / 25;
+}
+
+.karger-cuts__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.karger-cuts__edge {
+  stroke: var(--karger-cuts-edge);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.karger-cuts__edge.is-cut-edge {
+  stroke: var(--problem-accent);
+  stroke-width: 6;
+}
+
+.karger-cuts__boundary {
+  fill: none;
+  stroke: var(--karger-cuts-ink);
+  stroke-width: 2;
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+}
+
+.karger-cuts__node {
+  stroke-width: 3;
+}
+
+.karger-cuts__node-group.is-set-s .karger-cuts__node {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 4;
+}
+
+.karger-cuts__node-group.is-set-t .karger-cuts__node {
+  fill: var(--algorithm-background);
+  stroke: var(--algorithm-accent);
+}
+
+.karger-cuts__vertex-label {
+  fill: var(--karger-cuts-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .karger-cuts__legend {
+    justify-content: flex-start;
+  }
+
+  .karger-cuts__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .karger-cuts__canvas {
+    width: min(100%, 24rem);
+    margin-inline: auto;
+  }
+}
+
+.karger-runs {
+  --karger-runs-ink: #202020;
+  --karger-runs-muted: #6f695e;
+  --karger-runs-edge: #817b70;
+  --karger-runs-track: #c7c0b3;
+
+  margin: 1.75rem 0 2.25rem;
+  padding: 1.25rem 0 1rem;
+  border-top: 1px solid var(--problem-border);
+  border-bottom: 1px solid var(--problem-border);
+  color: var(--karger-runs-ink);
+}
+
+.karger-runs__stage {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.76fr) 2.1rem minmax(0, 1.55fr);
+  gap: 0.35rem;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.karger-runs__shared {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 1fr) minmax(4rem, 0.65fr) minmax(5.5rem, 1fr);
+  gap: 0.2rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.karger-runs__fork {
+  min-width: 0;
+}
+
+.karger-runs__fork svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.karger-runs__fork path {
+  fill: none;
+  stroke: var(--karger-runs-track);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.karger-runs__lanes {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+.karger-runs__lane {
+  min-width: 0;
+}
+
+.karger-runs__lane + .karger-runs__lane {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--problem-border);
+}
+
+.karger-runs__lane-title {
+  margin: 0 0 0.15rem;
+  color: var(--karger-runs-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.karger-runs__lane-sequence {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 1fr)
+    minmax(0, 0.6fr)
+    minmax(0, 1fr)
+    minmax(0, 0.72fr)
+    minmax(0, 1.15fr);
+  gap: 0.15rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.karger-runs__state {
+  min-width: 0;
+  margin: 0;
+}
+
+.karger-runs__state-label {
+  margin-bottom: 0.05rem;
+  color: var(--karger-runs-ink);
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.karger-runs__state-canvas {
+  width: 100%;
+  aspect-ratio: 170 / 118;
+}
+
+.karger-runs__state-canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.karger-runs__edge {
+  fill: none;
+  stroke: var(--karger-runs-edge);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 150ms ease, stroke-width 150ms ease;
+}
+
+.karger-runs__edge.is-selected {
+  stroke: var(--problem-accent);
+  stroke-width: 5;
+}
+
+.karger-runs__node {
+  fill: #fff;
+  stroke: var(--karger-runs-ink);
+  stroke-width: 2.5;
+  transition: fill 150ms ease, stroke 150ms ease, stroke-width 150ms ease;
+}
+
+.karger-runs__node-group.is-supernode .karger-runs__node {
+  fill: var(--problem-background);
+  stroke: var(--karger-runs-muted);
+  stroke-width: 3;
+}
+
+.karger-runs__node-group.is-selected-endpoint .karger-runs__node {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 4;
+}
+
+.karger-runs__node-group.is-set-s .karger-runs__node {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 4;
+}
+
+.karger-runs__node-group.is-set-t .karger-runs__node {
+  fill: var(--algorithm-background);
+  stroke: var(--algorithm-accent);
+  stroke-width: 3;
+}
+
+.karger-runs__node-label {
+  fill: var(--karger-runs-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 9px;
+  font-weight: 750;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.karger-runs__node-label.member-count-3,
+.karger-runs__node-label.member-count-4 {
+  font-size: 7.5px;
+}
+
+.karger-runs__edge-label {
+  fill: var(--karger-runs-ink);
+  stroke: #fff;
+  stroke-width: 3px;
+  paint-order: stroke fill;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 7.5px;
+  font-weight: 750;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.karger-runs__connector {
+  display: grid;
+  gap: 0.05rem;
+  align-content: center;
+  justify-items: center;
+  min-width: 0;
+}
+
+.karger-runs__connector-label {
+  color: var(--karger-runs-muted);
+  font-size: clamp(0.52rem, 0.77vw, 0.65rem);
+  font-weight: 650;
+  line-height: 1.12;
+  text-align: center;
+}
+
+.karger-runs__connector svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.karger-runs__arrow-track,
+.karger-runs__arrow-progress {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.karger-runs__arrow-track {
+  stroke: var(--karger-runs-track);
+}
+
+.karger-runs__arrow-progress {
+  stroke: var(--problem-accent);
+  stroke-width: 3;
+}
+
+.karger-runs__arrowhead {
+  fill: var(--problem-accent);
+}
+
+.karger-runs__returned-cut {
+  min-width: 0;
+  margin: 0;
+}
+
+.karger-runs__returned-caption {
+  min-height: 2.2em;
+  margin-bottom: 0;
+  font-size: clamp(0.56rem, 0.82vw, 0.68rem);
+  line-height: 1.1;
+}
+
+.karger-runs__returned-cut .karger-cuts__canvas {
+  width: 100%;
+  aspect-ratio: 36 / 25;
+}
+
+.karger-runs__returned-cut .karger-cuts__edge {
+  stroke-width: 4;
+}
+
+.karger-runs__returned-cut .karger-cuts__edge.is-cut-edge {
+  stroke-width: 7;
+}
+
+.karger-runs__returned-cut .karger-cuts__boundary {
+  stroke-width: 3;
+}
+
+.karger-runs__returned-cut .karger-cuts__vertex-label {
+  font-size: 24px;
+}
+
+.karger-runs__controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--problem-border);
+}
+
+.karger-runs__replay {
+  min-height: 2.45rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--karger-runs-ink);
+  border-radius: 0.25rem;
+  background: var(--karger-runs-ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.karger-runs__replay:hover:not(:disabled) {
+  border-color: var(--problem-accent);
+  background: #34312c;
+}
+
+.karger-runs__replay:focus-visible {
+  outline: 3px solid var(--problem-accent);
+  outline-offset: 2px;
+}
+
+.karger-runs__replay:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.karger-runs__status {
+  min-height: 1.5em;
+  margin: 0.65rem 0 0;
+  color: var(--karger-runs-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 680px) {
+  .karger-runs__stage {
+    display: block;
+  }
+
+  .karger-runs__shared {
+    grid-template-columns: minmax(0, 1fr) minmax(4rem, 0.58fr) minmax(0, 1fr);
+    width: min(100%, 23rem);
+    margin-inline: auto;
+  }
+
+  .karger-runs__fork {
+    display: none;
+  }
+
+  .karger-runs__lanes {
+    display: block;
+    margin-top: 1.25rem;
+  }
+
+  .karger-runs__lane,
+  .karger-runs__lane + .karger-runs__lane {
+    padding-top: 1rem;
+    border-top: 1px solid var(--problem-border);
+  }
+
+  .karger-runs__lane + .karger-runs__lane {
+    margin-top: 1.5rem;
+  }
+
+  .karger-runs__lane-title {
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .karger-runs__lane-sequence {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    justify-items: center;
+  }
+
+  .karger-runs__lane-sequence > [data-state-slot] {
+    width: min(100%, 13rem);
+  }
+
+  .karger-runs__lane-sequence > [data-cut-slot] {
+    width: min(100%, 15rem);
+  }
+
+  .karger-runs__lane-sequence .karger-runs__connector {
+    width: min(100%, 12rem);
+  }
+
+  .karger-runs__lane-sequence .karger-runs__connector svg {
+    width: 2.25rem;
+    transform: rotate(90deg);
+  }
+
+  .karger-runs__connector-label {
+    font-size: 0.68rem;
+  }
+
+  .karger-runs__returned-caption {
+    min-height: 0;
+    font-size: 0.76rem;
+  }
+
+  .karger-runs__controls {
+    justify-content: stretch;
+  }
+
+  .karger-runs__replay {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .karger-runs *,
+  .karger-runs *::before,
+  .karger-runs *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
