@@ -4,6 +4,12 @@ project:
   resources:
     - interactives/**
 
+metadata-files:
+  - annotations.yml
+
+filters:
+  - explain
+
 website:
   title: "Randomized Algorithms"
   navbar: false

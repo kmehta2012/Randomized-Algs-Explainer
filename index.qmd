@@ -10,7 +10,7 @@ Imagine you're a cracked engineer living in the 80s. The best available personal
 
 You're working on a computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions. 
 
-In particular, say you have two matrices $A \text{, } B \in \mathbb{R^{d \times d}}$ and you want to compute $AB$. If we use the naive pen and paper method of computing matrix multiplication, this amounts to $\Theta(d^3)$ amount of work.
+In particular, say you have two matrices $A \text{, } B \in \explain{real-matrices}{\mathbb{R}^{d \times d}}$ and you want to compute $AB$. If we use the naive pen and paper method of computing matrix multiplication, this amounts to $\Theta(d^3)$ amount of work.
 
 Say your matrices have dimensions (something), so doing the matrix multiplication on your own computer will take on the order of (absurdly large number) . 
 
@@ -38,7 +38,7 @@ Here's an algorithm idea -
 
 [Freivalds' Algorithm]{.algorithm-title}
 
-1. Sample a vector $v \in \{0,1\}^n$ uniformly at random.
+1. Sample a vector $v \in \explain{binary-vectors}{\{0,1\}^d}$ [uniformly at random]{.explain data-annotation="uniform-sampling"}.
 2. Compute $ABv$ and $Cv$.
 3. If $ABv$ = $Cv$, we say that the $AB = C$, else we say $AB \neq C$.
 

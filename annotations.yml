@@ -1,0 +1,13 @@
+annotations:
+  real-matrices:
+    title: "Real-valued matrices"
+    content: |
+      $\mathbb{R}^{d \times d}$ is the set of all $d \times d$ matrices whose entries are real numbers. Thus $A \in \mathbb{R}^{d \times d}$ means that $A$ is such a matrix.
+  binary-vectors:
+    title: "Binary vectors"
+    content: |
+      $\{0,1\}^d$ is the set of all length-$d$ vectors whose entries are either $0$ or $1$. For example, $\{0,1\}^2 = \{(0,0),(0,1),(1,0),(1,1)\}$. For $d=3$, examples include $(0,0,0)$, $(1,0,1)$, and $(1,1,1)$; there are $8$ vectors in total.
+  uniform-sampling:
+    title: "Uniform sampling"
+    content: |
+      Sampling uniformly at random from a finite set $S$ means that every element of $S$ is selected with the same probability, namely $1/|S|$.
