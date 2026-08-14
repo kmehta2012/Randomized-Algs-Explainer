@@ -2,17 +2,65 @@
 title: "An introduction to Randomized Algorithms"
 ---
 
-# Introduction
-
-# Problem: Verifying matrix multiplication
-
-Imagine you're a cracked engineer living in the 80s. The best available personal computer on which carry out your fancy math computations has an impressive ram of 4 MB and (if we apply Moore's law) is about $500,000$ times slower than a personal computer right now.
+Imagine you're a cracked engineer living in the 80s. You have a Compaq Deskpro 386/20, a state of the art personal computer of the time, that boasts an impressive performance [160,000]{.explain data-annotation="compaq-386-linpack-performance"} [Floating point operations (FLOPs)]{.explain data-annotation="floating-point-operation"} per second. 
 
 You're working on a computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions. 
 
-In particular, say you have two matrices $A \text{, } B \in \explain{real-matrices}{\mathbb{R}^{d \times d}}$ and you want to compute $AB$. If we use the naive pen and paper method of computing matrix multiplication, this amounts to $\Theta(d^3)$ amount of work.
+In particular, say you have two $3000 \times 3000$ dimensional matrices $A \text{, } B \in \explain{real-matrices}{\mathbb{R}^{d \times d}}$ and you want to compute $AB$. 
 
-Say your matrices have dimensions (something), so doing the matrix multiplication on your own computer will take on the order of (absurdly large number) . 
+To do this, you decide to implement the pen and paper matrix multiplication algorithm in code, and then run the code on your machine. How many Floating point operations will this take? 
+
+Let $P \in \mathbb{R}^{a \times b}, Q \in \mathbb{R}^{b \times c}, C = PQ \in \mathbb{R}^{a \times c}$. $C$ has $a \times c$ entries. To compute the $(i,j)^{\text{th}}$ entry, denoted by $C_{i,j}$, we do a dot product between the $i$th row of $P$ and the $j$th column of $Q$, that is:
+
+$$
+\begin{aligned}
+C_{i,j}
+  &= \sum_{k=1}^b P_{i,k}Q_{k,j} \\
+  &= P_{i,1}Q_{1, j} + P_{i, 2}Q_{2, j} + \dots + P_{i, b}Q_{b, j}.
+\end{aligned}
+$$
+
+There are $b$ multiplications, and $b-1$ additions, giving us a total FLOP count of $2b-1$ to compute one entry of C. Thus the total FLOP count to compute C is given as
+
+$$
+a \times c \times (2b-1).
+$$
+
+In your case you're multiplying two square $d \times d$ matrices. The total FLOPs in that case: 
+
+$$
+\begin{aligned}
+\text{Total FLOPs}
+  &= d \times d \times (2d-1) \\
+  &= 2d^3-d^2 \\
+  &\in O(d^3).
+\end{aligned}
+$$
+
+In your case, you want to compute $AB$.
+
+$$
+\begin{aligned}
+d &= 3000 \\
+\text{Total FLOPs}
+  &= 2\times 3000^3 - 3000^2 \\
+  &= \boxed{53{,}991{,}000{,}000\text{ FLOPs}}.
+\end{aligned}
+$$
+
+The time your computer would take to do this is given by:
+
+$$
+\begin{aligned}
+\text{Time taken by Compaq 386/20} &= \frac{\text{Total FLOPs}}{\text{FLOPs per second}} \\
+&= \frac{53{,}991{,}000{,}000}{160{,}000} \\
+&= 337{,}443.75\,\text{seconds} \\
+&\approx 94\,\text{hours} \\
+&\approx 3\,\text{days }22\,\text{hours}.
+\end{aligned}
+$$
+
+Computing just one pair of $3000 \times 3000$ matrix product would take you close to 4 days! 
 
 Realizing the impracticality, you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, $C$. 
 
@@ -26,7 +74,7 @@ Here it is stated more formally:
 
 [Matrix Multiplication Verification (MMV)]{.problem-title}
 
-Given three real-valued matrices $A, B, C \in \mathbb{R}^{d \times d}$, determine whether $AB = C$.
+Given three real-valued matrices $A, B, C \in \mathbb{R}^{d \times d}$, verify whether $AB = C$.
 
 :::
 
@@ -39,22 +87,109 @@ Here's an algorithm idea -
 [Freivalds' Algorithm]{.algorithm-title}
 
 1. Sample a vector $v \in \explain{binary-vectors}{\{0,1\}^d}$ [uniformly at random]{.explain data-annotation="uniform-sampling"}.
-2. Compute $ABv$ and $Cv$.
-3. If $ABv$ = $Cv$, we say that the $AB = C$, else we say $AB \neq C$.
+2. Compute $A(Bv)$ and $Cv$.
+3. If $A(Bv)=Cv$, we say that the $AB=C$, else we say $AB\neq C$.
 
 :::
 
-That's it. I want to emphasize the simplicity of this algorithm. For a seemingly complicated problem with significant challenges, we've proposed a 3 step algorithm. When I first encountered this algorithm in my studies, I thought to myself "surely this can't work. This has to be wrong." But it does. This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions. You'll have this "how tf can this work" feeling again and again, and that's why these are my favourite class of algorithms. 
+Frievalds' algorithm is an example of what we call a randomized algorithm. The first step of the algorithm involves a random choice where we randomly choose a vector from the set $\{0,1\}^d$. Let's state the definition precisely:
+
+::: {#definition-randomized-algorithm .definition-statement}
+
+[Randomized Algorithm]{.definition-title}
+
+A randomized algorithm is an algorithm that uses one or more random choices as part of its execution.
+
+:::
+
+When I first encountered Frievalds' in my studies, I was in disbelief. How can multiplying the matrices on a random vector give us any sort of confidence on whether the matrices in question are equal? This couldn't possibly work. It's too simple for a problem that seems more complicated. But it somehow does work. 
+
+This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions. This feeling of disbelief and wonder is precisely why randomized algorithms are my favourite class of algorithms. 
 
 Let's unpack this. 
 
-For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ $ABv = Cv$. So this algorithm never gives a false negative. If $AB$ is indeed equal to $C$, this algorithm will always work correctly. 
+For starters, if $AB = C$, then for any $v \in \{0,1\}^d$ $ABv = Cv$. So in this case the algorithm always works correctly.
 
-The time complexity is also better than computing $AB$ directly. We can compute $ABv$ as $A(Bv)$. Computing $Bv$ takes $\Theta(d^2)$ time and gives us a $d \times 1$ matrix. Multiplying $A$ with that takes $\Theta(d^2)$ time giving us an overall time complexity of $\Theta(d^2)$. Similarly, computing $Cv$ takes $\Theta(d^2)$ time too. Thus the overall time complexity is a more respectable $\Theta(d^2)$ compared the $\Theta(d^3)$ if we try to compute $AB$ directly. 
+The number of FLOPs taken to carry out one iteration of the algorithm is also better than computing $AB$ directly:
 
-But surely this algorithm fails? What if $AB \neq C$. In this case, we can probably come up with vector $v$ such that that $ABv = Cv$. Yes, that's indeed the case. Here's an example:
+$$
+\begin{aligned}
+\text{Total FLOPs}
+  &= \text{FLOPs for computing } Bv \\
+  &\quad + \text{FLOPs for computing } A(Bv) \\
+  &\quad + \text{FLOPs for computing } Cv.
+\end{aligned}
+$$
 
-::: {#example-freivalds-misleading-agreement}
+Since all the products are bewteen $d \times d$ matrix ($A$, $B$, $C$) and a $d \times 1$ matrix ($Bv$, $v$), they take the same FLOPs given by:
+
+$$
+d \times 1 \times (2d - 1) = 2d^2 - d.
+$$
+
+So, total FLOPs are given as:
+
+$$
+\begin{aligned}
+\text{Total FLOPs}
+  &= 3(2d^2-d) \\
+  &= 6d^2-3d \\
+  &\in O(d^2).
+\end{aligned}
+$$
+
+Asymptotically this algorithm is faster than computing $AB$ directly by a factor of $d$ ($O(d^3)$ vs $O(d^2)$). More exactly, 
+
+$$
+6d^2 - 3d < 2d^3 - d^2
+\qquad \text{for all integers } d \ge 4.
+$$
+
+In your case, 
+
+$$
+\begin{aligned}
+d &= 3000 \\
+\text{Total FLOPs}
+  &= 6 \times 3000^2 - 3 \times 3000 \\
+  &= \boxed{53{,}991{,}000\text{ FLOPs}}.
+\end{aligned}
+$$
+
+The time your computer would take to carry out one iteration is given by:
+
+$$
+\begin{aligned}
+\text{Time taken by Compaq 386/20} &= \frac{\text{Total FLOPs}}{\text{FLOPs per second}} \\
+&= \frac{53{,}991{,}000}{160{,}000} \\
+&= 337.44375\,\text{seconds} \\
+&\approx 5.62\,\text{minutes}.
+\end{aligned}
+$$
+
+Compared to computing $AB$ yourself, which would take $4$ days, you can now run this algorithm to verify $AB = C$ in a measly 5 minutes! This is amazing! It's almost too good to be true. Unfortunately, it is indeed to good to be true. 
+
+if $AB \neq C$, we can come up with vector $v$ such that that $ABv = Cv$. Here's an example of a Freivalds' Algorithm iteration that fails:
+
+:::: {#example-freivalds-misleading-agreement}
+
+```{=html}
+<div class="freivalds-failure" data-freivalds-failure-demo hidden>
+  <div class="freivalds-failure__stage" data-role="stage"></div>
+
+  <div class="freivalds-failure__controls">
+    <button class="freivalds-failure__replay" type="button" data-action="replay">
+      Replay
+    </button>
+  </div>
+
+  <p class="freivalds-failure__status" data-role="status" aria-live="polite">
+    The illustrative Freivalds iteration is ready to play.
+  </p>
+</div>
+```
+
+::: {.freivalds-failure__fallback data-freivalds-failure-fallback=""}
 
 $$
 \begin{aligned}
@@ -124,6 +259,12 @@ $$
 
 :::
 
+```{=html}
+<script type="module" src="interactives/freivalds-failure-demo.js"></script>
+```
+
+::::
+
 So what do we do now? 
 
 The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing : be extrememly confident, accepting a small chance that we're wrong. 
@@ -145,7 +286,7 @@ P[\text{Failure}]
 \end{aligned}
 $$ {#eq-freivalds-failure-coordinate}
 
-Since $D \neq 0$, there is atleast one non-zero entry in $D$. Say the $(i,j)^{\text{th}}$ entry, denoted by $D_{i,j}$, is non-zero.
+Since $D \neq 0$, there is at least one non-zero entry in $D$. Say the $(i,j)^{\text{th}}$ entry, denoted by $D_{i,j}$, is non-zero.
 
 By definition of matrix multiplication:
 
@@ -207,6 +348,37 @@ Thus
 $$
 \boxed{P[\text{Failure}] \leq \frac{1}{2}}
 $$
+
+So the probability that one iteration of Freivalds' gives us the wrong answer is atmost $\frac{1}{2}$. That is not that good. 
+
+Hence we come to the sledgehammer of Randomized Algorithms: *amplificatoin*. Sure, one iteration of Freivalds' is not that reliable. But, we can just repeat the algorithm as many times we like. 
+
+If $AB \neq C$ then all it takes for us to know that is for one of the iterations of Freivalds' to sample a vector $v$ such that $AB(v) \neq C$. Each iteration is independent of any other iteration: what vector $v$ was sampled in iteration $i$ has no effect on what vector is sampled in any other iteration $j$. 
+
+Let $E_i$ be the event that the $i^{th}$ iteration fails. If we repeat the algorithm $k$ times, the probability of failure becomes:
+
+$$
+\begin{aligned}
+ P[Failure] &= P[E_1 \cap E_2 \cap \dots \cap E_k] \\
+&= P[E_1] \times P[E_2] \times \dots \times P[E_k] \\
+&= \frac{{1}/{2^{k}}}
+\end{aligned}
+$$
+
+We can thus get the probability of failure arbitarily small. If you want the probability of failure to be atmost $\delta$, where $\frac{1}{2} >= \delta > 0$, we can repeat the algorithm $k = -\log_2(\delta)$ times. 
+
+If you wanted to get the probability of failure to $\frac{1}{2^{10}} \approx \frac{{1}/{1000}} = 0.001$, you need to repeat the algorithm $k = 10$ times, after which you can be much more confident about your verificatoin, having atmost a $0.01 %$ chance of being wrong! 
+
+That is only about $5$ mins $ \times 10 = 50$ mins of work on your Compaq Deskpro 386/20, still a measly amount compared to the 4 days that it'd take you to compute $AB$! 
+
+This completes our first randomized algorithm. Isn't it exciting? This problem defines well what a particular class of randomized algorithms do:
+1. Find a good random choice to make, and make an algorithm around it. 
+2. Analyse the randomized algorithm and hope that the probability bounds of failure are good enough.
+3. Amplify: Do several independent iterations of the randomized algorithm to get the failure probability to zero. 
+
+What do I mean by 'good enough'? We'll talk about that soon. 
+
+Now we move to another application of randomized algorithms - finding the mininum cut of a graph. This is my favourite graph algorithm, so lock in. 
 
 # Problem 2 : Min-Cut of a graph
 

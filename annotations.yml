@@ -11,3 +11,11 @@ annotations:
     title: "Uniform sampling"
     content: |
       Sampling uniformly at random from a finite set $S$ means that every element of $S$ is selected with the same probability, namely $1/|S|$.
+  compaq-386-linpack-performance:
+    title: "Compaq 386/20 benchmark performance"
+    content: |
+      Dongarra's LINPACK table reports $0.16$ Mflop/s for a Compaq 386/20 with an Intel 80387 math coprocessor, using Microsoft Fortran 4.1 on the $n=100$ benchmark. Since $1$ Mflop/s is $10^6$ floating-point operations per second, this is $160{,}000$ FLOP/s. Source: [Jack J. Dongarra, *Performance of Various Computers Using Standard Linear Equations Software*, University of Tennessee Computer Science Technical Report CS-89-85](https://icl.utk.edu/projectsfiles/rib/pubs/performance.pdf); also published in [*ACM SIGARCH Computer Architecture News*](https://doi.org/10.1145/141868.141871).
+  floating-point-operation:
+    title: "Floating-point operations (FLOPs)"
+    content: |
+      FLOP stands for floating-point operation, and FLOPs is its plural. A floating-point operation is an arithmetic operation on a real number, such as $+$, $-$, $\times$, or $\div$. For example, to compute $2 + 2 \times 5$, we perform two floating-point operations: one addition and one multiplication. A rate of $160{,}000$ FLOPs per second means $160{,}000$ such operations per second.
