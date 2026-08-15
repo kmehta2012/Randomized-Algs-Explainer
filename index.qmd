@@ -816,7 +816,7 @@ Sorting a set of numbers is among the most fundamental problems in computer scie
 
 In sorting you have a list of numbers and you want to arrange them in increasing or decreasing order. 
 
-Assume you get an input list of numbers A. 
+Assume you get an input list of numbers $A[1 \dots n]$ of size n. 
 
 Here's an algorithm -
 
@@ -856,7 +856,72 @@ Here's an algorithm -
 
 <script type="module" src="interactives/quicksort-pivot-comparison.js"></script>
 ```
+As can you can see, if we could somehow find the median as the pivot, the algorithm works well. In particular if we can find the pivot in $O(n)$ time where n is the size of the list, the time $T(n)$ taken so sort a list of size n is, 
 
+$$
+T(n) = 2T(\frac{n}{2}) + cn 
+$$
+
+Using master's thm (if you do not know what that is, just trust me on this):
+
+$$
+T(n) = O(nlog n)
+$$
+
+If you don't know this, $O(n log n)$ is the theoretical optimum for any comparison based sort. So this is asympotically optimal. 
+
+The only problem is, how are we planning on always finding the median element as the pivot?
+
+Here's the kicker - you don't have to worry about that to still get the optimal O(nlog n) time bound on average.
+
+Consider this algorithm, which we call Randomized Quick Sort - 
+
+::: {#algorithm-randomized-quicksort .algorithm-statement}
+
+[Randomized Quick Sort]{.algorithm-title}
+
+1. If $A$ contains at most one element, return $A$.
+2. Choose an element of $A$ uniformly at random as the pivot $p$.
+3. Partition the remaining elements of $A$ into two lists: $L$, containing every element less than or equal to $p$, and $R$, containing every element greater than $p$.
+4. Recursively sort $L$ and $R$ using the same steps 1-3.
+5. Return the concatenation of the sorted list $L$, the pivot $p$, and the sorted list $R$.
+
+:::
+
+Hence, we have a Randomized sorting algorithm, which we now call Randomized Quick Sort. Here's the theorem:
+
+::: {#thm-randomized-quicksort-running-time}
+
+The expected running time of Randomized Quick Sort on an input of $n$ distinct elements is $O(n \log n)$.
+
+
+
+:::
+I'm going to omit the proof of this theorem here. Quicksort is really popular and the proof can be found easily. For example, 
+See [Wikipedia's average-case analysis of Quicksort](https://en.wikipedia.org/wiki/Quicksort#Average-case_analysis) for a proof or CLRS Ch 7.
+
+It's important to note that this algorithm, unlike them previous two, never fails. Given any array, it'll always give us the sorted array. 
+
+This gives us a nice seperation of randomized algorithms in two types: Las Vegas and Monte Carlo.
+
+::: {#def
+inition-las-vegas-algorithm .definition-statement}
+
+[Las Vegas Algorithm]{.definition-title}
+
+A Las Vegas algorithm always returns a correct answer, but its running time may depend on the random choices it makes.
+
+:::
+
+::: {#definition-monte-carlo-algorithm .definition-statement}
+
+[Monte Carlo Algorithm]{.definition-title}
+
+A Monte Carlo algorithm may return an incorrect answer, but the probability that it does so is bounded.
+
+:::
+
+Randomized Quick Sort is a Las Vegas algorithm. Freivalds' algorithm and Karger's algorithm are Monte Carlo algorithms.
 
 
 # Challenges
