@@ -1,6 +1,16 @@
 ---
 title: "An introduction to Randomized Algorithms"
+abstract-title: "Prerequisites"
+abstract: |
+  To follow along, you should know:
+
+  1. Basic discrete probability (independence, inclusion-exclusion, conditional probability, and the law of total probability).
+  2. What a matrix is and how to multiply matrices.
+  3. [What a graph is](https://en.wikipedia.org/wiki/Graph_%28discrete_mathematics%29#Graph). The basic definition is sufficient.
+  4. Big-O notation is helpful, but optional.
 ---
+
+**AI Disclosure:** I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project will be linked here for reference.
 
 # Introduction
 
@@ -799,22 +809,75 @@ A single run of Karger's algorithm performs exactly $n-2$ edge contractions. Unf
 
 Running the algorithm independently $k$ times therefore takes $O(kn^2)$ time. 
 
+So far, both algorithms that we've discussed have a probability of failing. Can there be randomized algorithms that always run correctly? Yes! The next problem describes one such algorithm.
+
+# Fast sorting
+Sorting a set of numbers is among the most fundamental problems in computer science. 
+
+In sorting you have a list of numbers and you want to arrange them in increasing or decreasing order. 
+
+Assume you get an input list of numbers A. 
+
+Here's an algorithm -
+
+
+1. If $A$ contains at most one element, return $A$.
+2. Choose an element of $A$ as the pivot $p$.
+3. Partition the remaining elements of $A$ into two lists: $L$, containing every element less than or equal to $p$, and $R$, containing every element greater than $p$.
+4. Recursively sort $L$ and $R$ using the same steps 1-3.
+5. Return the concatenation of the sorted list $L$, the pivot $p$, and the sorted list $R$.
+
+```{=html}
+<div class="quicksort-pivots" data-quicksort-pivot-comparison>
+  <div class="quicksort-pivots__legend" aria-label="Quicksort pivot diagram legend">
+    <span><span class="quicksort-pivots__legend-cell is-pivot" aria-hidden="true"></span>Selected pivot</span>
+    <span><span class="quicksort-pivots__legend-cell" aria-hidden="true"></span>Other element</span>
+    <span><span class="quicksort-pivots__legend-empty" aria-hidden="true">∅</span>Empty partition</span>
+  </div>
+
+  <div class="quicksort-pivots__figures">
+    <figure class="quicksort-pivots__figure" data-quicksort-scenario="balanced">
+      <figcaption class="quicksort-pivots__caption">
+        <span class="quicksort-pivots__caption-title">Balanced pivot choices</span>
+        <span class="quicksort-pivots__caption-detail">Always choose the median value, so both partitions have the same size.</span>
+      </figcaption>
+      <div class="quicksort-pivots__canvas" data-role="quicksort-canvas"></div>
+    </figure>
+
+    <figure class="quicksort-pivots__figure" data-quicksort-scenario="poor-right">
+      <figcaption class="quicksort-pivots__caption">
+        <span class="quicksort-pivots__caption-title">A poor pivot subtree</span>
+        <span class="quicksort-pivots__caption-detail">After choosing 8, repeatedly choose the smallest value in the right partition.</span>
+      </figcaption>
+      <div class="quicksort-pivots__canvas" data-role="quicksort-canvas"></div>
+    </figure>
+  </div>
+</div>
+
+<script type="module" src="interactives/quicksort-pivot-comparison.js"></script>
+```
+
+
+
 # Challenges
 
-Before I conclude this explainer, I must warn you. As I hope these algorithms have demonstrated, randomized algorithms can be remarkably simple. The algorithms we've discussed have minimal steps, and don't even do any complex operations over the random choice. The random experiment we do to make our random choice (like sampling from a uniform distribution), is also a simple experiment.
+Before I conclude this explainer, I must warn you. As I hope these algorithms have demonstrated, randomized algorithms can be remarkably simple. The algorithms we've discussed have minimal steps, and don't even do any complex operations over the random choice. The random experiment we do to make our random choice (like sampling from a uniform distribution) is also a simple experiment.
 
 You must not confuse this simplicity with easiness. If you've learnt enough math, you'll know that often the simplest ideas are the hardest things to come up with. 
 
-When I mentioned the [general three step process to come up with a randomized algorithm](#general-randomized-algorithm-process), I used the words "good enough." Let's expound on what that means. 
+When I mentioned the [general three-step process to come up with a randomized algorithm](#general-randomized-algorithm-process), I used the words "good enough." Let's expound on what that means. 
 
-For a randomized algorithm to work, we need two things:
+For a randomized algorithm of the kind we have discussed to be useful, we need two things:
+
+::: {.key-observations}
 
 1. For the random choice we decide to make, we must be able to come up with an expression that bounds the probability of failure: 
 
-This is hard. Even though the algorithms we discussed were simple, the way we went about dervining the failure bounds for the algorithms was not obvious. If you're inspired after reading the explainer and decide to solve a few problems on constructing a randomized algorithm, you'll immediately run into this issue. 
+    This is hard. Even though the algorithms we discussed were simple, the way we went about deriving the failure bounds for the algorithms was not obvious. If you're inspired after reading the explainer and decide to solve a few problems on constructing a randomized algorithm, you'll immediately run into this issue. 
 
+2. In general, if one run takes time $T$ and we amplify by running the algorithm $k$ times, the total running time of the algorithm is $O(kT)$. This tells us that, for the algorithm to work practically, one run should be quick enough and the function that bounds the failure probability from above should vanish toward 0 quickly enough on repeated runs of the algorithm. If either of these conditions is false, the algorithm might be impractical because it'd simply take too much time to run for a good enough probability bound!
 
-2. One run of the randomized algorith should be quick enough and the function that bounds the failure probability from above should vanish toward 0 quickly enough on repeated runs of the algorithm. If either of these conditions are false, the algorithm might be impractical because it'd simply take too much time to run for a good enough probability bound!
+:::
 
 Let's talk about the second point in more detail. We go back to the [Matrix Multiplication Verification problem](#problem-matrix-multiplication-verification). This time, we consider a different randomized algorithm to solve it:
 
@@ -830,30 +893,31 @@ Let's talk about the second point in more detail. We go back to the [Matrix Mult
 
 
 
-Let $F$ be the event that the algorithm fails
+Let $F$ be the event that the algorithm fails.
 
 Let $D = AB - C$. We notice that, like Freivalds' algorithm, this algorithm fails only when $AB \neq C \iff D \neq 0$. Thus to compute the probability of failure we fix $A, B, C$ such that $AB \neq C$
 
-If we sample $j$ such that $D_{:,j} = AB_{:,j} - C_{:,j} \neq 0$ then  our algorithm correctly reports that $AB \neq C$.
+If we sample $j$ such that $D_{:,j} = AB_{:,j} - C_{:,j} \neq 0$ then our algorithm correctly reports that $AB \neq C$.
 
-It's only when $D_{:,j} = 0$ that the algorithm fails by incorrectly saying that $AB = C$
+It's only when $D_{:,j} = 0$ that the algorithm fails by incorrectly saying that $AB = C$.
 
-Thus $F = \{j \in \{1, \dots, d\} | $D_{:,j} = 0\}$ 
+Thus $F = \left\{j \in \{1, \dots, d\} \mid D_{:,j} = 0\right\}$.
 
 
 
 
 $$
-P[F] = P[$D_{:,j} = 0]
+P[F] = P[D_{:,j} = 0]
 $$
 
-Let $t$ be the number of non-zero columns in $D$. Since $D \neq Q$, it contains at least one nonzero column. 
+Let $t$ be the number of nonzero columns in $D$. Since $D \neq 0$, it contains at least one nonzero column. 
 
 $$
 1 \leq t \leq d
 $$
 
 The probability of failure becomes
+
 $$
 \begin{aligned}
 P[F] &= \frac{d-t}{d} \\
@@ -863,9 +927,9 @@ P[F] &= \frac{d-t}{d} \\
 \end{aligned}
 $$
 
-Compared to the Frievalds' flat bound of $\frac{1}{2}$, this absolutely sucks. It is also an extrememly slowly decreasing function, and will take a lot of amplifications to bound the probability to an acceptable amount.
+Compared to the Freivalds' flat bound of $\frac{1}{2}$, this absolutely sucks. Under amplification, this bound also decreases extremely slowly, and it will take many runs to reduce the failure probability to an acceptable amount.
 
-For a concrete example, let's go back to multiplying two $3000 \times 3000$ matrices on a a Compaq Deskpro 386/20 having 160,000 FLOPs.
+For a concrete example, let's go back to multiplying two $3000 \times 3000$ matrices on a Compaq Deskpro 386/20 having 160,000 FLOPs per second.
 
 To compute the $j^{\text{th}}$ column of $AB$, we multiply the $d \times d$ matrix $A$ by the $d \times 1$ matrix $B_{:,j}$. From our [previous derivation of the FLOPs for multiplying two compatible matrices](#eq-compatible-matrix-multiplication-flops), multiplying an $a \times b$ matrix by a $b \times c$ matrix takes:
 
@@ -879,7 +943,7 @@ $$
 \begin{aligned}
 \text{Total FLOPs}
   &= d \times 1 \times (2d-1) \\
-  &= 2d^2-d \\
+  &= 2d^2-d
 \end{aligned}
 $$
 
@@ -894,15 +958,15 @@ d &= 3000 \\
 \end{aligned}
 $$
 
-If you compare it with the total FLOPs for one run of Frievalds', it is significantly less ($\approx 18$ Billion vs $\approx 54$ billion).
+If you compare it with the total FLOPs for one run of Freivalds' algorithm, it is significantly less ($\approx 18$ million vs $\approx 54$ million).
 
-This suggests that one iteration of this algorithm significantly faster than one iteration of Frievalds'.
+This suggests that one run of this algorithm is significantly faster than one run of Freivalds' algorithm.
 
-However, its probability bounds suck. At $d = 300$, the probablility we fail is at most $\frac{2999}{3000} \approx 0.99667$! That's as bad as it gets.
+However, its probability bounds suck. At $d = 3000$, the probability we fail is at most $\frac{2999}{3000} \approx 0.99967$! That's as bad as it gets.
 
 Let's see how amplification works for this algorithm. 
 
-Let $F_i$ be the event that the $i^{\text{th}}$ iteration fails, and let $F^{(k)}$ be the event that the complete $k$-iteration algorithm fails. If we repeat the algorithm $k$ times, we fail only if every iteration fails. The probability of failure becomes:
+Let $F_i$ be the event that the $i^{\text{th}}$ run fails, and let $F^{(k)}$ be the event that the amplified $k$-run algorithm fails. If we run the algorithm $k$ times, we fail only if every run fails. The probability of failure becomes:
 
 $$
 \begin{aligned}
@@ -959,7 +1023,7 @@ $$
 \end{aligned}
 $$
 
-The time your computer would take to carry out all $6907$ iterations is given by:
+The time your computer would take to carry out all $6907$ runs is given by:
 
 $$
 \begin{aligned}
@@ -974,10 +1038,13 @@ $$
 
 That's even more impractical than the 4 days it'd take you to compute $AB$ directly!
 
-What went wrong with this algorithm? The probability bound $\frac{d}{d-1}$ was simply vanishing too slowly.
+What went wrong with this algorithm? The amplified probability bound $\left(\frac{d-1}{d}\right)^k$ simply decreases too slowly as $k$ grows.
 
---
+This algorithm succumbs to the second challenge of being practical, because it fails at having a probability bound that vanishes quickly enough. 
 
-The two points above are by no means an exhaustive list over all challenges that come up when designing a randomized algorithm, but nonetheless I give you a good sense of why this is hard. 
+I hope these two challenges - the second one in particular - have given you a sense of how hard designing a practical, working randomized algorithm is.
 
 # Conclusion
+If you've read this explainer till here, thank you for sticking around! I remember the feeling of disbelief and wonder when I first studied Randomized Algorithms, and I hope I've been able to instill that feeling through this explainer. 
+
+If you enjoyed reading this, I suggest reading the book Probability and Computing. I could not cover a lot of algorithms that I think are really cool. I'll list them here for you to check: (1) Johnson-Lindstrauss dimensionality reduction (2) Morris counter

@@ -205,6 +205,200 @@ h3 {
   line-height: 1;
 }
 
+.quicksort-pivots {
+  --quicksort-pivots-ink: #202020;
+  --quicksort-pivots-muted: #6f695e;
+  --quicksort-pivots-structure: #c7c0b3;
+
+  margin: 1.75rem 0 2.25rem;
+  padding: 1.15rem 0 1rem;
+  border-top: 1px solid var(--problem-border);
+  border-bottom: 1px solid var(--problem-border);
+  color: var(--quicksort-pivots-ink);
+}
+
+.quicksort-pivots__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1.2rem;
+  color: var(--quicksort-pivots-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.quicksort-pivots__legend > span {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.quicksort-pivots__legend-cell,
+.quicksort-pivots__legend-empty {
+  display: inline-grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  border: 1.5px solid var(--algorithm-border);
+  border-radius: 0.18rem;
+  background: white;
+  color: var(--quicksort-pivots-muted);
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.quicksort-pivots__legend-cell.is-pivot {
+  border: 2px solid var(--problem-accent);
+  background: var(--problem-background);
+}
+
+.quicksort-pivots__legend-empty {
+  border-style: dashed;
+  background: var(--algorithm-background);
+}
+
+.quicksort-pivots__figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 1.75rem);
+  align-items: start;
+}
+
+.quicksort-pivots__figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.quicksort-pivots__figure + .quicksort-pivots__figure {
+  padding-left: clamp(1rem, 3vw, 1.75rem);
+  border-left: 1px solid var(--algorithm-border);
+}
+
+.quicksort-pivots__caption {
+  margin-bottom: 0.45rem;
+  text-align: center;
+}
+
+.quicksort-pivots__caption-title,
+.quicksort-pivots__caption-detail {
+  display: block;
+}
+
+.quicksort-pivots__caption-title {
+  color: var(--quicksort-pivots-ink);
+  font-size: 0.98rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.quicksort-pivots__caption-detail {
+  margin-top: 0.12rem;
+  color: var(--quicksort-pivots-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.quicksort-pivots__canvas {
+  width: 100%;
+}
+
+.quicksort-pivots__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.quicksort-pivots__link {
+  fill: none;
+  stroke: var(--quicksort-pivots-structure);
+  stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.quicksort-pivots__link.is-poor-path {
+  stroke: var(--problem-accent);
+  stroke-width: 2.4;
+}
+
+.quicksort-pivots__link-label {
+  fill: var(--quicksort-pivots-muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.quicksort-pivots__cell rect {
+  fill: white;
+  stroke: var(--algorithm-border);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.quicksort-pivots__cell.is-pivot rect {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 2.4;
+}
+
+.quicksort-pivots__cell text,
+.quicksort-pivots__empty-label {
+  fill: var(--quicksort-pivots-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.quicksort-pivots__cell.is-pivot text {
+  fill: #6d490f;
+}
+
+.quicksort-pivots__empty-box {
+  fill: var(--algorithm-background);
+  stroke: var(--algorithm-border);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.quicksort-pivots__node.is-poor-path .quicksort-pivots__empty-box {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+}
+
+.quicksort-pivots__empty-label {
+  fill: var(--quicksort-pivots-muted);
+  font-size: 15px;
+}
+
+@media (max-width: 780px) {
+  .quicksort-pivots__figures {
+    grid-template-columns: 1fr;
+  }
+
+  .quicksort-pivots__figure + .quicksort-pivots__figure {
+    padding-top: 1.5rem;
+    padding-left: 0;
+    border-top: 1px solid var(--algorithm-border);
+    border-left: 0;
+  }
+
+  .quicksort-pivots__legend {
+    justify-content: flex-start;
+  }
+
+  .quicksort-pivots__caption {
+    text-align: left;
+  }
+
+}
+
 .edge-demo {
   margin: 1.75rem 0 2.25rem;
   padding: clamp(1rem, 3vw, 1.5rem);
