@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "An introduction to Randomized Algorithms",
     "section": "",
-    "text": "AI Disclosure: I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project will be linked here for reference."
+    "text": "AI Disclosure: I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project can be found in the public GitHub repository for reference."
   },
   {
     "objectID": "index.html#bounding-the-failure-probability",
