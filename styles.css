@@ -150,6 +150,61 @@ h3 {
   outline-offset: 3px;
 }
 
+.key-observations {
+  margin: 1.5rem 0 2rem;
+}
+
+.key-observations > ol {
+  counter-reset: key-observation;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.key-observations > ol > li {
+  counter-increment: key-observation;
+  position: relative;
+  margin: 0;
+  padding: 1.4rem 0 1.6rem 3.7rem;
+  border-top: 1px solid var(--algorithm-border);
+}
+
+.key-observations > ol > li:last-child {
+  border-bottom: 1px solid var(--algorithm-border);
+}
+
+.key-observations > ol > li::before {
+  content: counter(key-observation);
+  position: absolute;
+  top: 1.25rem;
+  left: 0;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.2rem;
+  background: var(--algorithm-accent);
+  color: white;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.key-observations > ol > li > p:first-child {
+  margin-top: 0;
+  color: #202427;
+}
+
+.key-observations > ol > li > :last-child {
+  margin-bottom: 0;
+}
+
+.proof-qed {
+  display: block;
+  margin-top: 0.45rem;
+  text-align: left;
+  line-height: 1;
+}
+
 .edge-demo {
   margin: 1.75rem 0 2.25rem;
   padding: clamp(1rem, 3vw, 1.5rem);
