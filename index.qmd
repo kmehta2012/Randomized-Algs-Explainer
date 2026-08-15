@@ -10,7 +10,7 @@ abstract: |
   4. Big-O notation is helpful, but optional.
 ---
 
-**AI Disclosure:** I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project will be linked here for reference.
+**AI Disclosure:** I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project can be found in the [public GitHub repository](https://github.com/kmehta2012/Randomized-Algs-Explainer) for reference.
 
 # Introduction
 
@@ -816,7 +816,7 @@ Sorting a set of numbers is among the most fundamental problems in computer scie
 
 In sorting you have a list of numbers and you want to arrange them in increasing or decreasing order. 
 
-Assume you get an input list of numbers $A[1 \dots n]$ of size n. 
+Assume you get an input list of numbers $A[1 \dots n]$ of size $n$.
 
 Here's an algorithm -
 
@@ -856,23 +856,23 @@ Here's an algorithm -
 
 <script type="module" src="interactives/quicksort-pivot-comparison.js"></script>
 ```
-As can you can see, if we could somehow find the median as the pivot, the algorithm works well. In particular if we can find the pivot in $O(n)$ time where n is the size of the list, the time $T(n)$ taken so sort a list of size n is, 
+As you can see, if we could somehow find the median as the pivot, the algorithm works well. In particular, if we can find the pivot in $O(n)$ time, where $n$ is the size of the list, the time $T(n)$ taken to sort a list of size $n$ is:
 
 $$
 T(n) = 2T(\frac{n}{2}) + cn 
 $$
 
-Using master's thm (if you do not know what that is, just trust me on this):
+Using the Master theorem (if you do not know what that is, just trust me on this):
 
 $$
-T(n) = O(nlog n)
+T(n) = O(n \log n)
 $$
 
-If you don't know this, $O(n log n)$ is the theoretical optimum for any comparison based sort. So this is asympotically optimal. 
+No comparison-based sorting algorithm can do asymptotically better than $n \log n$ in general, so this running time is asymptotically optimal.
 
 The only problem is, how are we planning on always finding the median element as the pivot?
 
-Here's the kicker - you don't have to worry about that to still get the optimal O(nlog n) time bound on average.
+Here's the kicker - you don't have to worry about that to still get the optimal $O(n \log n)$ time bound on average.
 
 Consider this algorithm, which we call Randomized Quick Sort - 
 
@@ -888,24 +888,23 @@ Consider this algorithm, which we call Randomized Quick Sort -
 
 :::
 
-Hence, we have a Randomized sorting algorithm, which we now call Randomized Quick Sort. Here's the theorem:
+Hence, we have a randomized sorting algorithm, which we now call Randomized Quick Sort. Here's the theorem:
 
 ::: {#thm-randomized-quicksort-running-time}
 
-The expected running time of Randomized Quick Sort on an input of $n$ distinct elements is $O(n \log n)$.
+If Randomized Quick Sort is run repeatedly on the same input of $n$ distinct elements, using fresh random pivot choices each time, its average running time is $O(n \log n)$.
 
 
 
 :::
-I'm going to omit the proof of this theorem here. Quicksort is really popular and the proof can be found easily. For example, 
-See [Wikipedia's average-case analysis of Quicksort](https://en.wikipedia.org/wiki/Quicksort#Average-case_analysis) for a proof or CLRS Ch 7.
 
-It's important to note that this algorithm, unlike them previous two, never fails. Given any array, it'll always give us the sorted array. 
+I'm going to omit the proof of this theorem here. Quicksort is widely studied, and proofs are readily available; see [Wikipedia's average-case analysis of Quicksort](https://en.wikipedia.org/wiki/Quicksort#Average-case_analysis) or Chapter 7 of CLRS.
 
-This gives us a nice seperation of randomized algorithms in two types: Las Vegas and Monte Carlo.
+It's important to note that this algorithm, unlike the previous two, never fails. Given any array, it'll always give us the sorted array.
 
-::: {#def
-inition-las-vegas-algorithm .definition-statement}
+This gives us a nice separation of randomized algorithms into two types: Las Vegas and Monte Carlo.
+
+::: {#definition-las-vegas-algorithm .definition-statement}
 
 [Las Vegas Algorithm]{.definition-title}
 
