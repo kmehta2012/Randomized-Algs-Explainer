@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Karan Mehta">
 
-<title>Randomized Algorithms</title>
+<title>An introduction to Randomized Algorithms – Randomized Algorithms</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -46,6 +45,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/explain-annotations-0.1.0/explain.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -134,9 +134,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#start-writing-here" id="toc-start-writing-here" class="nav-link active" data-scroll-target="#start-writing-here">Start writing here</a></li>
-  <li><a href="#interactive-wiring-check" id="toc-interactive-wiring-check" class="nav-link" data-scroll-target="#interactive-wiring-check">Interactive wiring check</a></li>
-  <li><a href="#next-section" id="toc-next-section" class="nav-link" data-scroll-target="#next-section">Next section</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#finding-the-minimum-cut" id="toc-finding-the-minimum-cut" class="nav-link" data-scroll-target="#finding-the-minimum-cut"><span class="header-section-number">2</span> Finding the Minimum Cut</a>
+  <ul>
+  <li><a href="#bounding-the-failure-probability" id="toc-bounding-the-failure-probability" class="nav-link" data-scroll-target="#bounding-the-failure-probability"><span class="header-section-number">2.1</span> Bounding the Failure Probability</a></li>
+  <li><a href="#running-time" id="toc-running-time" class="nav-link" data-scroll-target="#running-time"><span class="header-section-number">2.2</span> Running Time</a></li>
+  </ul></li>
+  <li><a href="#fast-sorting" id="toc-fast-sorting" class="nav-link" data-scroll-target="#fast-sorting"><span class="header-section-number">3</span> Fast sorting</a></li>
+  <li><a href="#challenges" id="toc-challenges" class="nav-link" data-scroll-target="#challenges"><span class="header-section-number">4</span> Challenges</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">5</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -145,65 +151,832 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Randomized Algorithms</h1>
-<p class="subtitle lead">An interactive explainer — working draft</p>
+<h1 class="title">An introduction to Randomized Algorithms</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Karan Mehta </p>
-          </div>
-  </div>
     
   
     
   </div>
   
+<div>
+  <div class="abstract">
+    <div class="block-title">Prerequisites</div>
+    <p>To follow along, you should know:</p>
+    <ol type="1">
+    <li>Basic discrete probability (independence, inclusion-exclusion, conditional probability, and the law of total probability).</li>
+    <li>What a matrix is and how to multiply matrices.</li>
+    <li><a href="https://en.wikipedia.org/wiki/Graph_%28discrete_mathematics%29#Graph">What a graph is</a>. The basic definition is sufficient.</li>
+    <li>Big-O notation is helpful, but optional.</li>
+    </ol>
+  </div>
+</div>
 
 
 </header>
 
 
-<div class="draft-note">
-<p>This is the working page for your explainer. Write the article in this file, put mathematics inside LaTeX delimiters, and keep interactive code in the <code>interactives</code> folder.</p>
-</div>
-<section id="start-writing-here" class="level2">
-<h2 class="anchored" data-anchor-id="start-writing-here">Start writing here</h2>
-<p>Replace this starter text with your introduction. Ordinary paragraphs are just ordinary text—there is no HTML involved.</p>
-<p>Inline mathematics looks like (G=(V,E)). Display mathematics gets its own block:</p>
+<p><strong>AI Disclosure:</strong> I conceived and directed all the visuals in this explainer, which were implemented in JavaScript with the help of a coding agent. The source code for the entire project will be linked here for reference.</p>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Imagine you’re a cracked engineer living in the 80s. You have a Compaq Deskpro 386/20, a state of the art personal computer of the time, that boasts an impressive performance <span class="explain" data-annotation="compaq-386-linpack-performance">160,000</span> <span class="explain" data-annotation="floating-point-operation">Floating point operations (FLOPs)</span> per second.</p>
+<p>You’re working on a computational math problem that requires you to compute matrix multiplications of matrices with massive dimensions.</p>
+<p>In particular, say you have two <span class="math inline">3000 \times 3000</span> dimensional matrices <span class="explain-math inline" data-explain-tex="QSBcdGV4dHssIH0gQiBcaW4gXGh0bWxEYXRhe2Fubm90YXRpb249cmVhbC1tYXRyaWNlc317XG1hdGhiYntSfV57ZCBcdGltZXMgZH19"></span> and you want to compute <span class="math inline">AB</span>.</p>
+<p>To do this, you decide to implement the pen and paper matrix multiplication algorithm in code, and then run the code on your machine. How many Floating point operations will this take?</p>
+<p>Let <span class="math inline">P \in \mathbb{R}^{a \times b}, Q \in \mathbb{R}^{b \times c}, C = PQ \in \mathbb{R}^{a \times c}</span>. <span class="math inline">C</span> has <span class="math inline">a \times c</span> entries. To compute the <span class="math inline">(i,j)^{\text{th}}</span> entry, denoted by <span class="math inline">C_{i,j}</span>, we do a dot product between the <span class="math inline">i</span>th row of <span class="math inline">P</span> and the <span class="math inline">j</span>th column of <span class="math inline">Q</span>, that is:</p>
 <p><span class="math display">
-\Pr[\text{success after } t \text{ trials}]
-= 1 - (1-p)^t.
+\begin{aligned}
+C_{i,j}
+  &amp;= \sum_{k=1}^b P_{i,k}Q_{k,j} \\
+  &amp;= P_{i,1}Q_{1, j} + P_{i, 2}Q_{2, j} + \dots + P_{i, b}Q_{b, j}.
+\end{aligned}
 </span></p>
-</section>
-<section id="interactive-wiring-check" class="level2">
-<h2 class="anchored" data-anchor-id="interactive-wiring-check">Interactive wiring check</h2>
-<p>This small component verifies that custom JavaScript works inside the article. Select a random edge to highlight it; replace this component when you begin building the actual Karger visualization.</p>
-<div class="edge-demo" data-random-edge-demo="">
-  <div class="edge-demo__canvas" aria-label="A sample graph with four vertices"></div>
-  <div class="edge-demo__controls">
-    <button class="edge-demo__button" type="button" data-action="choose">
-      Choose a random edge
+<p>There are <span class="math inline">b</span> multiplications, and <span class="math inline">b-1</span> additions, giving us a total FLOP count of <span class="math inline">2b-1</span> to compute one entry of C. Thus the total FLOP count to compute C is given as</p>
+<p><span id="eq-compatible-matrix-multiplication-flops"><span class="math display">
+a \times c \times (2b-1).
+\tag{1}</span></span></p>
+<p>In your case you’re multiplying two square <span class="math inline">d \times d</span> matrices. The total FLOPs in that case:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Total FLOPs}
+  &amp;= d \times d \times (2d-1) \\
+  &amp;= 2d^3-d^2 \\
+  &amp;\in O(d^3).
+\end{aligned}
+</span></p>
+<p>In your case, you want to compute <span class="math inline">AB</span>.</p>
+<p><span class="math display">
+\begin{aligned}
+d &amp;= 3000 \\
+\text{Total FLOPs}
+  &amp;= 2\times 3000^3 - 3000^2 \\
+  &amp;= \boxed{53{,}991{,}000{,}000\text{ FLOPs}}.
+\end{aligned}
+</span></p>
+<p>The time your computer would take to do this is given by:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Time taken by Compaq 386/20} &amp;= \frac{\text{Total FLOPs}}{\text{FLOPs per second}} \\
+&amp;= \frac{53{,}991{,}000{,}000}{160{,}000} \\
+&amp;= 337{,}443.75\,\text{seconds} \\
+&amp;\approx 94\,\text{hours} \\
+&amp;\approx 3\,\text{days }22\,\text{hours}.
+\end{aligned}
+</span></p>
+<p>Multiplying just one pair of <span class="math inline">3000 \times 3000</span> matrices would take close to four days!</p>
+<p>Realizing the impracticality, you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, <span class="math inline">C</span>.</p>
+<p>Now you’re a bit paranoid. You did not write the code for the supercomputer. Maybe their code has a subtle bug that got exposed on your massive matrix multiplication load. How can you be sure <span class="math inline">AB</span> is indeed <span class="math inline">C</span>?</p>
+<p>This is what we call the <em>matrix multiplication verification problem (MMV)</em>.</p>
+<p>Here it is stated more formally:</p>
+<div id="problem-matrix-multiplication-verification" class="problem-statement">
+<p><span class="problem-title">Matrix Multiplication Verification (MMV)</span></p>
+<p>Given three real-valued matrices <span class="math inline">A, B, C \in \mathbb{R}^{d \times d}</span>, verify whether <span class="math inline">AB = C</span>.</p>
+</div>
+<p>How can you solve this problem? The only way to be absolutely sure is to compute <span class="math inline">AB</span> yourself and compare it with C. But the impracticality of doing so was the whole point of using the supercomputer provider. What do you do then? How can you be more confident?</p>
+<p>Here’s an algorithm idea -</p>
+<div id="algorithm-freivalds" class="algorithm-statement">
+<p><span class="algorithm-title">Freivalds’ Algorithm</span></p>
+<ol type="1">
+<li>Sample a vector <span class="explain-math inline" data-explain-tex="diBcaW4gXGh0bWxEYXRhe2Fubm90YXRpb249YmluYXJ5LXZlY3RvcnN9e1x7MCwxXH1eZH0="></span> <span class="explain" data-annotation="uniform-sampling">uniformly at random</span>.</li>
+<li>Compute <span class="math inline">A(Bv)</span> and <span class="math inline">Cv</span>.</li>
+<li>If <span class="math inline">A(Bv)=Cv</span>, we say that <span class="math inline">AB=C</span>, else we say <span class="math inline">AB\neq C</span>.</li>
+</ol>
+</div>
+<p>Freivalds’ algorithm is an example of what we call a randomized algorithm. The first step of the algorithm involves a random choice where we randomly choose a vector from the set <span class="math inline">\{0,1\}^d</span>. Let’s state the definition precisely:</p>
+<div id="definition-randomized-algorithm" class="definition-statement">
+<p><span class="definition-title">Randomized Algorithm</span></p>
+<p>A randomized algorithm is an algorithm that uses one or more random choices as part of its execution.</p>
+</div>
+<p>When I first encountered Freivalds’ in my studies, I was in disbelief. How can multiplying the matrices on a random vector give us any sort of confidence on whether the matrices in question are equal? This couldn’t possibly work. It’s too simple for a problem that seems more complicated. But it somehow does work.</p>
+<p>This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions. This feeling of disbelief and wonder is precisely why randomized algorithms are my favourite class of algorithms.</p>
+<p>Let’s unpack this.</p>
+<p>For starters, if <span class="math inline">AB = C</span>, then for any <span class="math inline">v \in \{0,1\}^d</span> <span class="math inline">ABv = Cv</span>. So in this case the algorithm always works correctly.</p>
+<p>The number of FLOPs taken to carry out one iteration of the algorithm is also better than computing <span class="math inline">AB</span> directly:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Total FLOPs}
+  &amp;= \text{FLOPs for computing } Bv \\
+  &amp;\quad + \text{FLOPs for computing } A(Bv) \\
+  &amp;\quad + \text{FLOPs for computing } Cv.
+\end{aligned}
+</span></p>
+<p>Since all the products are between <span class="math inline">d \times d</span> matrices (<span class="math inline">A</span>, <span class="math inline">B</span>, <span class="math inline">C</span>) and <span class="math inline">d \times 1</span> matrices (<span class="math inline">Bv</span>, <span class="math inline">v</span>), they take the same FLOPs given by:</p>
+<p><span class="math display">
+d \times 1 \times (2d - 1) = 2d^2 - d.
+</span></p>
+<p>So, total FLOPs are given as:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Total FLOPs}
+  &amp;= 3(2d^2-d) \\
+  &amp;= 6d^2-3d \\
+  &amp;\in O(d^2).
+\end{aligned}
+</span></p>
+<p>Asymptotically this algorithm is faster than computing <span class="math inline">AB</span> directly by a factor of <span class="math inline">d</span> (<span class="math inline">O(d^3)</span> vs <span class="math inline">O(d^2)</span>). More exactly,</p>
+<p><span class="math display">
+6d^2 - 3d &lt; 2d^3 - d^2
+\qquad \text{for all integers } d \ge 4.
+</span></p>
+<p>In your case,</p>
+<p><span class="math display">
+\begin{aligned}
+d &amp;= 3000 \\
+\text{Total FLOPs}
+  &amp;= 6 \times 3000^2 - 3 \times 3000 \\
+  &amp;= \boxed{53{,}991{,}000\text{ FLOPs}}.
+\end{aligned}
+</span></p>
+<p>The time your computer would take to carry out one iteration is given by:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Time taken by Compaq 386/20} &amp;= \frac{\text{Total FLOPs}}{\text{FLOPs per second}} \\
+&amp;= \frac{53{,}991{,}000}{160{,}000} \\
+&amp;= 337.44375\,\text{seconds} \\
+&amp;\approx 5.62\,\text{minutes}.
+\end{aligned}
+</span></p>
+<p>Compared to computing <span class="math inline">AB</span> yourself, which would take <span class="math inline">4</span> days, you can now run this algorithm to verify <span class="math inline">AB = C</span> in a measly 5.62 minutes! This is amazing! It’s almost too good to be true. Unfortunately, it is indeed too good to be true.</p>
+<p>If <span class="math inline">AB \neq C</span>, we can come up with a vector <span class="math inline">v</span> such that <span class="math inline">ABv = Cv</span>. Here’s an example of a Freivalds’ Algorithm iteration that fails:</p>
+<div id="example-freivalds-misleading-agreement">
+<div class="freivalds-failure" data-freivalds-failure-demo="" hidden="">
+  <div class="freivalds-failure__stage" data-role="stage"></div>
+
+  <div class="freivalds-failure__controls">
+    <button class="freivalds-failure__replay" type="button" data-action="replay">
+      Replay
     </button>
-    <button class="edge-demo__button edge-demo__button--secondary" type="button" data-action="reset">
+  </div>
+
+  <p class="freivalds-failure__status" data-role="status" aria-live="polite">
+    The illustrative Freivalds iteration is ready to play.
+  </p>
+</div>
+<div class="freivalds-failure__fallback" data-freivalds-failure-fallback="">
+<p><span class="math display">
+\begin{aligned}
+A &amp;=
+\begin{pmatrix}
+1 &amp; 1 \\
+0 &amp; 1
+\end{pmatrix},
+\\
+B &amp;=
+\begin{pmatrix}
+1 &amp; 0 \\
+1 &amp; 1
+\end{pmatrix}, \\
+C &amp;=
+\begin{pmatrix}
+1 &amp; 2 \\
+1 &amp; 1
+\end{pmatrix}.
+\end{aligned}
+</span></p>
+<p><span class="math display">
+\begin{aligned}
+AB
+  &amp;=
+  \begin{pmatrix}
+  2 &amp; 1 \\
+  1 &amp; 1
+  \end{pmatrix}
+  \neq C, \\
+v^{(1)}
+  &amp;=
+  \begin{pmatrix}
+  1 \\
+  1
+  \end{pmatrix}.
+\end{aligned}
+</span></p>
+<p><span class="math display">
+\begin{aligned}
+Bv^{(1)}
+  &amp;=
+  \begin{pmatrix}
+  1 \\
+  2
+  \end{pmatrix}, \\
+A\bigl(Bv^{(1)}\bigr)
+  &amp;=
+  \begin{pmatrix}
+  3 \\
+  2
+  \end{pmatrix}, \\
+Cv^{(1)}
+  &amp;=
+  \begin{pmatrix}
+  3 \\
+  2
+  \end{pmatrix}.
+\end{aligned}
+</span></p>
+<p><span class="math display">
+ABv^{(1)}=Cv^{(1)}.
+</span></p>
+</div>
+<script type="module" src="interactives/freivalds-failure-demo.js"></script>
+</div>
+<p>So what do we do now?</p>
+<p>The key is to remember that we want to be more <em>confident</em> about whether <span class="math inline">AB = C</span>. Being absolutely sure would be the best case, but since it is impractical to compute <span class="math inline">AB</span> ourselves, we can settle for the next best thing: be extremely confident, accepting a small chance that we’re wrong.</p>
+<p>This is our cue to think in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let’s analyse this:</p>
+<p>Let <span class="math inline">D = AB-C</span>. Thus <span class="math inline">D=0 \Leftrightarrow AB=C</span>.</p>
+<p>The algorithm can fail only when <span class="math inline">AB \neq C</span>, equivalently <span class="math inline">D \neq 0</span>. We fix the inputs <span class="math inline">A, B, C</span> to the algorithm such that <span class="math inline">AB \neq C</span>. All probabilities below then are over the randomly sampled vector <span class="math inline">v</span>. The algorithm fails if it claims that <span class="math inline">AB=C</span>. Let <span class="math inline">F = \{v \in \{0,1\}^d | Dv = 0\}</span>. The probability of failure then is exactly <span class="math inline">P[F] = P[Dv = 0]</span>.</p>
+<p>Let <span class="math inline">r_k</span> be the <span class="math inline">k^{\text{th}}</span> entry of the <span class="math inline">d \times 1</span> matrix <span class="math inline">Dv</span>.</p>
+<p><span id="eq-freivalds-failure-coordinate"><span class="math display">
+\begin{aligned}
+P[F]
+  &amp;= P[Dv=0] \\
+  &amp;= P[r_1=0 \cap r_2=0 \cap \cdots \cap r_d=0] \\
+  &amp;\leq P[r_k=0], \quad \text{for any } k \in \{1,2,\ldots,d\}
+\end{aligned}
+\tag{2}</span></span></p>
+<p>Since <span class="math inline">D \neq 0</span>, there is at least one non-zero entry in <span class="math inline">D</span>. Say the <span class="math inline">(i,j)^{\text{th}}</span> entry, denoted by <span class="math inline">D_{i,j}</span>, is non-zero.</p>
+<p>By definition of matrix multiplication:</p>
+<p><span class="math display">
+r_i = \sum_{k=1}^{d} D_{i,k}v_k = D_{i,j}v_j+Y, \quad \text{where } Y := \sum_{\substack{k=1 \\ k\neq j}}^{d} D_{i,k}v_k \text{ is a random variable}
+</span></p>
+<p>Let’s compute the probability that <span class="math inline">r_i=0</span>.</p>
+<p>For every sampled vector <span class="math inline">v</span>, exactly one of <span class="math inline">Y=0</span> and <span class="math inline">Y\neq0</span> occurs. Therefore, the law of total probability gives:</p>
+<p><span id="eq-freivalds-total-probability"><span class="math display">
+\begin{aligned}
+P[r_i=0]
+  &amp;= P[(Y \neq 0 \cap r_i=0) \cup (Y=0 \cap r_i=0)] \\
+  &amp;= P[r_i=0 \mid Y \neq 0]P[Y \neq 0] + P[r_i=0 \mid Y=0]P[Y=0]
+\end{aligned}
+\tag{3}</span></span></p>
+<p><span class="math display">
+P[r_i=0 \mid Y \neq 0] = P\left[v_j=-\frac{Y}{D_{i,j}} \mid Y \neq 0\right]
+</span></p>
+<p>If <span class="math inline">-\frac{Y}{D_{i,j}} \in \{0,1\}</span> then <span class="math inline">P[v_j = -\frac{Y}{D_{i,j}} \mid Y \neq 0] = \frac{1}{2}</span>. If <span class="math inline">-\frac{Y}{D_{i,j}} \in \mathbb{R} \setminus \{0,1\}</span>, <span class="math inline">P[v_j = -\frac{Y}{D_{i,j}} \mid Y \neq 0] = 0</span>. Thus we get: <span id="eq-freivalds-first-case"><span class="math display">
+P[r_i=0 \mid Y \neq 0] = P\left[v_j=-\frac{Y}{D_{i,j}} \mid Y \neq 0\right] \leq \frac{1}{2}
+\tag{4}</span></span></p>
+<p><span id="eq-freivalds-second-case"><span class="math display">
+P[r_i=0 \mid Y=0] = P[v_j=0] = \frac{1}{2}
+\tag{5}</span></span></p>
+<p>Substituting <a href="#eq-freivalds-first-case" class="quarto-xref">Equation&nbsp;4</a> and <a href="#eq-freivalds-second-case" class="quarto-xref">Equation&nbsp;5</a> into <a href="#eq-freivalds-total-probability" class="quarto-xref">Equation&nbsp;3</a>, we get:</p>
+<p><span class="math display">
+\begin{aligned}
+P[r_i=0]
+  &amp;\leq \frac{1}{2}P[Y \neq 0] + \frac{1}{2}P[Y=0] \\
+  &amp;= \frac{1}{2}\left[P[Y \neq 0] + P[Y=0]\right] \\
+  &amp;= \frac{1}{2}
+\end{aligned}
+</span></p>
+<p>From <a href="#eq-freivalds-failure-coordinate" class="quarto-xref">Equation&nbsp;2</a>:</p>
+<p><span class="math display">
+P[F] \leq P[r_i=0] \leq \frac{1}{2}
+</span></p>
+<p>Thus</p>
+<p><span class="math display">
+\boxed{P[F] \leq \frac{1}{2}}
+</span></p>
+<p>So the probability that one iteration of Freivalds’ gives us the wrong answer is at most <span class="math inline">\frac{1}{2}</span>. That is not that good.</p>
+<p>Hence we come to the sledgehammer of Randomized Algorithms: <em>amplification</em>. Sure, one iteration of Freivalds’ is not that reliable. But we can repeat the algorithm as many times as we like. Let’s make this idea formal:</p>
+<div id="definition-amplification" class="definition-statement">
+<p><span class="definition-title">Amplification</span></p>
+<p>Amplification is a technique for reducing the error probability of a randomized algorithm by running it independently multiple times.</p>
+</div>
+<p>If <span class="math inline">AB \neq C</span> then all it takes for us to know that is for one of the iterations of Freivalds’ to sample a vector <span class="math inline">v</span> such that <span class="math inline">A(Bv) \neq Cv</span>. Each iteration is independent of any other iteration: what vector <span class="math inline">v</span> was sampled in iteration <span class="math inline">i</span> has no effect on what vector is sampled in any other iteration <span class="math inline">j</span>.</p>
+<p>Let <span class="math inline">F_i</span> be the event that the <span class="math inline">i^{\text{th}}</span> iteration fails, and let <span class="math inline">F^{(k)}</span> be the event that the complete <span class="math inline">k</span>-iteration algorithm fails. If we repeat the algorithm <span class="math inline">k</span> times, we fail only if every iteration fails. The probability of failure becomes:</p>
+<p><span class="math display">
+\begin{aligned}
+P[F^{(k)}] &amp;= P[F_1 \cap F_2 \cap \dots \cap F_k] \\
+&amp;= P[F_1] \times P[F_2] \times \dots \times P[F_k] \\
+&amp;\leq \left(\frac{1}{2}\right)^k \\
+&amp;= \frac{1}{2^k}
+\end{aligned}
+</span></p>
+<p>We can thus get the probability of failure arbitrarily small. If you want the probability of failure to be at most <span class="math inline">\delta</span>, where <span class="math inline">\frac{1}{2} \geq \delta &gt; 0</span>, we can repeat the algorithm <span class="math inline">k = \left\lceil -\log_2(\delta) \right\rceil</span> times.</p>
+<p>If you wanted to get the probability of failure to be at most <span class="math inline">\frac{1}{2^{10}} \approx \frac{1}{1000} = 0.001</span>, you need to repeat the algorithm <span class="math inline">k = 10</span> times, after which you can be much more confident about your verification, having at most a <span class="math inline">0.1\%</span> chance of being wrong!</p>
+<p>That is only about <span class="math inline">5.62\text{ minutes} \times 10 = 56.2\text{ minutes}</span> of work on your Compaq Deskpro 386/20, still a measly amount compared to the 4 days that it’d take you to compute <span class="math inline">AB</span>!</p>
+<p>This completes our first randomized algorithm. Isn’t it exciting? This problem defines well what a particular class of randomized algorithms do:</p>
+<div id="general-randomized-algorithm-process">
+<ol type="1">
+<li>Find a good random choice to make, and make an algorithm around it.</li>
+<li>Analyse the randomized algorithm and hope that the probability bounds of failure are good enough.</li>
+<li>Amplify: Do several independent iterations of the randomized algorithm to get the failure probability to an arbitrarily small non-zero value.</li>
+</ol>
+</div>
+<p>What do I mean by ‘good enough’? We’ll talk about that soon.</p>
+<p>Now we move to another application of randomized algorithms - finding the minimum cut of a graph. This is my favourite graph algorithm, so lock in.</p>
+</section>
+<section id="finding-the-minimum-cut" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Finding the Minimum Cut</h1>
+<p>You’re a computer network administrator and you’ve been tasked by your company to check its computer network for risks that may make it unavailable to users.</p>
+<p>Here’s a visual of the computer network you’re managing:</p>
+<div class="computer-network" data-computer-network-diagram="">
+  <div class="computer-network__canvas" data-role="network-canvas"></div>
+</div>
+
+<script type="module" src="interactives/computer-network-diagram.js"></script>
+<p>The lines between each computer represent wires connecting them. In particular, any two computers A and B in the network are connected and reachable to each other if there is a path of wires that leads us from A to B.</p>
+<p>One metric you care about is the resistance of the network’s connectivity to damaged wires. In particular, what’s the smallest number of wires that, if damaged, would make the network unconnected (meaning that there are at least two computers that cannot reach each other)?</p>
+<p>If we think of the computer network as a graph, with the computers being vertices and the wires being edges, this metric amounts to finding the minimum cut of the graph.</p>
+<p>Let’s define what a cut is:</p>
+<div id="definition-cut" class="definition-statement">
+<p><span class="definition-title">Cut</span></p>
+<p>A cut <span class="math inline">C = (S, T)</span> of a graph <span class="math inline">G=(V, E)</span> is a partition of the vertices into two disjoint non-empty subsets <span class="math inline">S \subset V</span> and <span class="math inline">T = V \setminus S</span>.</p>
+</div>
+<div id="definition-cut-size" class="definition-statement">
+<p><span class="definition-title">Size of a Cut</span></p>
+<p>The size of a cut <span class="math inline">C=(S,T)</span> is the number of edges with one endpoint in <span class="math inline">S</span> and the other in <span class="math inline">T</span>. We say that any such edge belongs to the cut <span class="math inline">C</span>, denoted by <span class="math inline">e\in C</span>.</p>
+</div>
+<p>Let’s see different cuts and their cut sizes on the computer network graph.</p>
+<div class="karger-cuts" data-karger-cut-examples="">
+  <ul class="karger-cuts__legend" aria-label="Cut diagram legend">
+    <li><span class="karger-cuts__legend-node is-set-s" aria-hidden="true"></span>Vertex in S</li>
+    <li><span class="karger-cuts__legend-node is-set-t" aria-hidden="true"></span>Vertex in T</li>
+    <li><span class="karger-cuts__legend-line is-cut-edge" aria-hidden="true"></span>Edge in cut</li>
+    <li><span class="karger-cuts__legend-line is-cut-boundary" aria-hidden="true"></span>Cut boundary</li>
+  </ul>
+
+  <div class="karger-cuts__grid">
+    <figure id="cut-example-a" class="karger-cuts__figure figure" data-cut-id="A">
+      <figcaption class="karger-cuts__caption">Cut A <span aria-hidden="true">·</span> size 3</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas=""></div>
+    </figure>
+
+    <figure id="cut-example-b" class="karger-cuts__figure figure" data-cut-id="B">
+      <figcaption class="karger-cuts__caption">Cut B <span aria-hidden="true">·</span> size 4</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas=""></div>
+    </figure>
+
+    <figure id="cut-example-c" class="karger-cuts__figure figure" data-cut-id="C">
+      <figcaption class="karger-cuts__caption">Cut C <span aria-hidden="true">·</span> size 5</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas=""></div>
+    </figure>
+
+    <figure id="cut-example-d" class="karger-cuts__figure figure" data-cut-id="D">
+      <figcaption class="karger-cuts__caption">Cut D <span aria-hidden="true">·</span> size 2</figcaption>
+      <div class="karger-cuts__canvas" data-cut-canvas=""></div>
+    </figure>
+  </div>
+</div>
+
+<script type="module" src="interactives/karger-cut-examples.js"></script>
+<p>Now that we understand what a cut is, we can formally state the minimum-cut problem:</p>
+<div id="problem-minimum-cut" class="problem-statement">
+<p><span class="problem-title">Minimum Cut</span></p>
+<p>Given an undirected connected graph <span class="math inline">G</span>, find a minimum cut of <span class="math inline">G</span>.</p>
+</div>
+<p>As you may observe, the minimum cut on the computer network graph has size 2, and is defined by the sets <span class="math inline">S = \{1, 2, 3, 4\}</span> and <span class="math inline">T = \{5\}</span>. Removing the edges of this cut make the graph disconnected, and form the smallest possible set of edges whose removal disconnects the graph. This is precisely the metric you wanted to calculate for the computer network!</p>
+<p>This graph has a unique minimum cut, but a graph can have multiple distinct cuts that attain the minimum-cut size.</p>
+<p>There are several deterministic algorithms that can find the minimum cut of a graph. If you’ve ever read them (for example the ones based on finding the max-flow), you’d know those algorithms tend to be complicated. Randomization, on the other hand, gives us a really simple and elegant algorithm.</p>
+<p>Before I share this algorithm, we need to define what it means to <em>contract</em> an edge. Here’s the formal definition:</p>
+<div id="definition-edge-contraction" class="definition-statement">
+<p><span class="definition-title">Edge Contraction</span></p>
+<p>Contracting an edge <span class="math inline">e=\{u,v\}</span> in a graph <span class="math inline">G</span> means merging <span class="math inline">u</span> and <span class="math inline">v</span> into a single merged vertex <span class="math inline">w</span>. Every edge that previously had exactly one of <span class="math inline">u</span> or <span class="math inline">v</span> as an endpoint now has <span class="math inline">w</span> as that endpoint. All edges between <span class="math inline">u</span> and <span class="math inline">v</span> disappear.</p>
+</div>
+<div class="edge-contraction" data-edge-contraction-demo="">
+  <div class="edge-contraction__stage">
+    <figure class="edge-contraction__figure figure">
+      <figcaption class="edge-contraction__figure-title">Original graph</figcaption>
+      <div class="edge-contraction__canvas" data-role="original-graph"></div>
+    </figure>
+
+    <div class="edge-contraction__transition" data-role="transition-stage">
+      <div class="edge-contraction__transition-title" data-role="transition-title">
+        Contract 1–3
+      </div>
+      <div class="edge-contraction__arrow" data-role="transition-arrow"></div>
+    </div>
+
+    <figure class="edge-contraction__figure figure">
+      <figcaption class="edge-contraction__figure-title">Contracted graph</figcaption>
+      <div class="edge-contraction__canvas" data-role="contracted-graph"></div>
+    </figure>
+  </div>
+
+  <div class="edge-contraction__controls">
+    <label class="edge-contraction__field">
+      <span>Edge to contract</span>
+      <select data-role="edge-select">
+        <option value="13" selected="">1–3</option>
+        <option value="12">1–2</option>
+        <option value="14">1–4</option>
+        <option value="23">2–3</option>
+        <option value="24">2–4</option>
+        <option value="34">3–4</option>
+        <option value="35">3–5</option>
+        <option value="45">4–5</option>
+      </select>
+    </label>
+    <button class="edge-contraction__button edge-contraction__button--primary" type="button" data-action="run">
+      Run contraction
+    </button>
+    <button class="edge-contraction__button" type="button" data-action="reset">
       Reset
     </button>
   </div>
-  <p class="edge-demo__status" aria-live="polite">No edge selected yet.</p>
+
+  <p class="edge-contraction__status" data-role="status" aria-live="polite">
+    Edge 1–3 is selected.
+  </p>
 </div>
 
-<script type="module" src="interactives/random-edge-demo.js"></script>
+<script type="module" src="interactives/edge-contraction-demo.js"></script>
+<p>A common confusion is what happens if <span class="math inline">e = \{u, v\}</span> is one of several parallel edges between <span class="math inline">u</span> and <span class="math inline">v</span>. As per the definition, any edge that has both <span class="math inline">u</span> and <span class="math inline">v</span> as an endpoint will vanish. Thus all the parallel edges disappear.</p>
+<p>Now we have all the machinery needed to state our randomized algorithm.</p>
+<div id="algorithm-karger" class="algorithm-statement">
+<p><span class="algorithm-title">Karger’s Algorithm</span></p>
+<ol type="1">
+<li>Repeat until <span class="math inline">G</span> has exactly two vertices:
+<ol type="1">
+<li>Select an edge in <span class="math inline">G</span> uniformly at random.</li>
+<li>Contract the selected edge.</li>
+</ol></li>
+<li>Return the unique cut that remains in <span class="math inline">G</span>.</li>
+</ol>
+</div>
+<p>Here are two different runs of Karger’s algorithm on the computer network graph:</p>
+<div class="karger-runs" data-karger-run-comparison="">
+  <div class="karger-runs__stage" data-role="run-stage"></div>
+
+  <div class="karger-runs__controls">
+    <button class="karger-runs__replay" type="button" data-action="replay">
+      Replay
+    </button>
+  </div>
+
+  <p class="karger-runs__status" data-role="status" aria-live="polite">
+    The two Karger executions are ready to play.
+  </p>
+</div>
+
+<script type="module" src="interactives/karger-run-comparison.js"></script>
+<section id="bounding-the-failure-probability" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="bounding-the-failure-probability"><span class="header-section-number">2.1</span> Bounding the Failure Probability</h2>
+<p>Just like how we upper bounded the failure probability for Freivalds’ algorithm, let’s do the same for Karger. Before we do that, let’s establish some notation.</p>
+<p>Let <span class="math inline">|V| = n</span> and <span class="math inline">|E| = m</span>.</p>
+<p>Let <span class="math inline">G^{(i)}</span> denote the graph after <span class="math inline">i-1</span> contractions. Thus, <span class="math inline">G^{(1)}=G</span>.</p>
+<p>Let</p>
+<p><span class="math display">
+n_i := |V(G^{(i)})|, \qquad m_i := |E(G^{(i)})|
+</span></p>
+<p>denote the number of vertices and edges in <span class="math inline">G^{(i)}</span>, respectively. In particular, <span class="math inline">n_1=n</span> and <span class="math inline">m_1=m</span>.</p>
+<p>It is important to observe three things:</p>
+<div class="key-observations">
+<ol type="1">
+<li><p>Every edge contraction decreases the number of vertices in the graph by one. Since each iteration of Karger’s algorithm performs exactly one contraction, we have:</p>
+<p><span class="math display">
+n_i=n-i+1.
+</span></p>
+<p>Moreover, since the algorithm runs until only two vertices remain, it performs exactly <span class="math inline">n-2</span> edge contractions.</p></li>
+<li><p>Any cut in <span class="math inline">G^{(i)}</span> corresponds to a cut of the same size in <span class="math inline">G</span>. Thus, the minimum-cut size of <span class="math inline">G^{(i)}</span> is greater than or equal to the minimum-cut size of <span class="math inline">G</span>, for all <span class="math inline">i</span>.</p>
+<p>What do I mean? Let’s make a cut <span class="math inline">(S^{(i)},T^{(i)})</span> of <span class="math inline">G^{(i)}</span>. Every vertex <span class="math inline">v \in V(G^{(i)})</span> is a nonempty subset of the original vertices. This includes singleton subsets for unmerged vertices, such as <span class="math inline">\{5\}</span>, and subsets of the form <span class="math inline">v=\{a,b,c,\dots\}</span> for merged vertices.</p>
+<p>Let <span class="math inline">C = (S, T)</span> be the cut in <span class="math inline">G</span> that corresponds to the cut <span class="math inline">(S^{(i)}, T^{(i)})</span> in graph <span class="math inline">G^{(i)}</span>. <span class="math inline">S</span> is constructed from <span class="math inline">S^{(i)}</span> by taking the union over every vertex in <span class="math inline">S^{(i)}</span>.</p>
+<p><span class="math inline">T</span> is constructed from <span class="math inline">T^{(i)}</span> in the same way.</p>
+<p>The edges belonging to the cut <span class="math inline">(S,T)</span> are precisely the same as the edges belonging to the cut <span class="math inline">(S^{(i)},T^{(i)})</span>. Hence, the two cuts have the same size.</p>
+<p>As an example, let’s look at graph <span class="math inline">G^{(4)}</span> in the successful Karger run shown above. The cut it defines is <span class="math inline">S^{(4)}=\{\{1,2,3,4\}\}</span>, <span class="math inline">T^{(4)}=\{\{5\}\}</span>.</p>
+<p>In the original graph, this is the cut <span class="math inline">S=\{1,2,3,4\}</span>, <span class="math inline">T=\{5\}</span>.</p>
+<p>There were two edges between <span class="math inline">\{1,2,3,4\}</span> and <span class="math inline">\{5\}</span>, which correspond exactly to the edges <span class="math inline">\{3,5\}</span> and <span class="math inline">\{4,5\}</span> in <span class="math inline">G</span> that belong to the cut <span class="math inline">(S,T)</span>.</p>
+<p>You can see how this cut looks like in both the graphs in the successful run version of the visual above.</p></li>
+<li><p>For any minimum cut <span class="math inline">C</span> in graph <span class="math inline">G</span>, Karger’s algorithm fails to find <span class="math inline">C</span> if it contracts any edge <span class="math inline">e \in C</span>. For example, in the failed Karger run shown in the visual, the algorithm contracted the edge <span class="math inline">\{3,5\}</span> in graph <span class="math inline">G^{(2)}</span>, which was part of the minimum cut <span class="math inline">C</span>.</p></li>
+</ol>
+</div>
+<p>Let <span class="math inline">C_1, C_2, \dots, C_\ell</span> be all the minimum cuts of graph <span class="math inline">G=(V,E)</span>, each having size <span class="math inline">\lambda</span>. Karger’s algorithm fails to find minimum cut <span class="math inline">C_j</span> precisely when it contracts an edge of <span class="math inline">C_j</span>. Thus, Karger’s algorithm fails to find any minimum cut when it contracts at least one edge belonging to each minimum cut.</p>
+<p>Let <span class="math inline">E_j</span> be the event that Karger’s algorithm fails to find cut <span class="math inline">C_j</span>. Let <span class="math inline">F</span> be the event that Karger’s algorithm fails to find any minimum cut. We have:</p>
+<p><span class="math display">
+P[F] = P[E_1 \cap E_2 \cap \dots \cap E_\ell] \leq P[E_j] \quad \text{for any } j \in \{1,2,\dots,\ell\}.
+</span></p>
+<p>Let’s fix our focus on the <span class="math inline">j^{\text{th}}</span> minimum cut and find <span class="math inline">P[E_j]</span>.</p>
+<p>To do so, we use the following lemma:</p>
+<div id="lem-minimum-cut-edge-bound" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 1 (Minimum-Cut Edge Bound)</strong></span> If an undirected graph <span class="math inline">G=(V,E)</span> has <span class="math inline">n</span> vertices, <span class="math inline">m</span> edges, and a minimum cut of size <span class="math inline">\lambda</span>, then</p>
+<p><span class="math display">
+m \geq \frac{\lambda n}{2}.
+</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>We proceed by contradiction. Suppose that</p>
+<p><span class="math display">
+m &lt; \frac{\lambda n}{2}.
+</span></p>
+<p>By the handshake lemma,</p>
+<p><span class="math display">
+2m=\sum_{v\in V}\deg(v).
+</span></p>
+<p>Therefore,</p>
+<p><span class="math display">
+\sum_{v\in V}\deg(v)&lt;\lambda n.
+</span></p>
+<p>This implies that there is at least one vertex <span class="math inline">v\in V</span> such that <span class="math inline">\deg(v)&lt;\lambda</span>. Consider the cut <span class="math inline">S=\{v\}</span> and <span class="math inline">T=V\setminus\{v\}</span>. This cut has size <span class="math inline">\deg(v)&lt;\lambda</span>, contradicting the fact that <span class="math inline">G</span> has a minimum cut of size <span class="math inline">\lambda</span>.</p>
+<p><span class="proof-qed" aria-label="End of proof"><span class="math inline">\blacksquare</span></span></p>
+</div>
+<p>We find <span class="math inline">P[E_j]</span> by computing its complement, <span class="math inline">P[E_j^c]</span>. That is, we compute the probability that Karger’s algorithm finds the cut <span class="math inline">C_j</span>.</p>
+<p>To find the minimum cut, Karger’s algorithm must not contract any edge of <span class="math inline">C_j</span>. Let <span class="math inline">A_i</span> be the event that Karger’s algorithm does not contract an edge of <span class="math inline">C_j</span> on its <span class="math inline">i^{\text{th}}</span> iteration.</p>
+<p>Thus,</p>
+<p><span class="math display">
+\begin{aligned}
+P[E_j^c] &amp;= P[A_1 \cap A_2 \cap \dots \cap A_{n-2}] \\
+&amp;= P[A_1] \times P[A_2 \mid A_1] \times P[A_3 \mid A_2 \cap A_1] \times \dots \times P[A_{n-2} \mid A_{n-3} \cap A_{n-4} \cap \dots \cap A_1]
+\end{aligned}
+</span></p>
+<p>Let’s compute <span class="math inline">P[A_i \mid A_{i-1} \cap A_{i-2} \cap \dots \cap A_1]</span>, the probability that Karger’s algorithm does not contract an edge of <span class="math inline">C_j</span> on the <span class="math inline">i^{\text{th}}</span> iteration, given that no edge of <span class="math inline">C_j</span> was contracted in the previous <span class="math inline">i-1</span> iterations.</p>
+<p><span class="math display">
+\begin{aligned}
+P[A_i \mid A_{i-1} \cap A_{i-2} \cap \dots \cap A_1] &amp;= 1 - P[\text{an edge of } C_j \text{ is contracted on iteration } i \mid A_{i-1} \cap A_{i-2} \cap \dots \cap A_1] \\
+&amp;= 1 - \frac{\lambda}{m_i}
+\end{aligned}
+</span></p>
+<p>Since all the edges of <span class="math inline">C_j</span> have survived so far, <span class="math inline">C_j</span> remains a cut of size <span class="math inline">\lambda</span> in <span class="math inline">G^{(i)}</span>. By observation 2, the minimum-cut size of <span class="math inline">G^{(i)}</span> is at least <span class="math inline">\lambda</span>. Since <span class="math inline">C_j</span> is still a cut of size <span class="math inline">\lambda</span> in <span class="math inline">G^{(i)}</span>, its minimum-cut size is also at most <span class="math inline">\lambda</span>. Therefore, the minimum-cut size of <span class="math inline">G^{(i)}</span> is exactly <span class="math inline">\lambda</span>.</p>
+<p>Applying the lemma to <span class="math inline">G^{(i)}</span> gives:</p>
+<p><span class="math display">
+m_i \geq \frac{\lambda n_i}{2} = \frac{\lambda(n-i+1)}{2}.
+</span></p>
+<p>Thus,</p>
+<p><span class="math display">
+\begin{aligned}
+P[A_i \mid A_{i-1} \cap A_{i-2} \cap \dots \cap A_1] &amp;\geq 1 - \frac{\lambda}{\frac{\lambda(n-i+1)}{2}} \\
+&amp;= 1 - \frac{2}{n-i+1}
+\end{aligned}
+</span></p>
+<p>Thus we can now compute <span class="math inline">P[E_j^c]</span>:</p>
+<p><span class="math display">
+\begin{aligned}
+P[E_j^c] &amp; \geq \prod_{i=1}^{n-2} (1 - \frac{2}{n-i+1}) \\
+&amp; = \frac{2}{n(n-1)}
+\end{aligned}
+</span></p>
+<p>Thus the probability that Karger’s algorithm fails to find minimum cut <span class="math inline">C_j</span> is:</p>
+<p><span class="math display">
+\begin{aligned}
+P[E_j] &amp;= 1 - P[E_j^c] \\
+&amp;\leq 1 - \frac{2}{n(n-1)}
+\end{aligned}
+</span></p>
+<p>We use the fact that <span class="math inline">1 + x \leq e^x</span> for all <span class="math inline">x \in \mathbb{R}</span>, and get:</p>
+<p><span class="math display">
+\begin{aligned}
+P[E_j] &amp;\leq 1 - \frac{2}{n(n-1)} \\
+&amp;\leq e^{-2/(n(n-1))}
+\end{aligned}
+</span></p>
+<p>The probability that Karger’s algorithm fails is then bounded as:</p>
+<p><span class="math display">
+\begin{aligned}
+P[F] &amp;\leq P[E_j] \\
+&amp;\leq e^{-2/(n(n-1))}
+\end{aligned}
+</span></p>
+<p>What does this exponential upper bound mean? For our graph, <span class="math inline">n=5</span>, so the probability of failure is at most <span class="math inline">e^{-2/(5\cdot4)}=e^{-0.1}\approx 0.905</span>.</p>
+<p>That absolutely sucks!</p>
+<p>What can we do to get this to a more respectable number? Amplify. We run Karger’s algorithm independently <span class="math inline">k</span> times and return the smallest cut found. The amplified algorithm fails only if none of the <span class="math inline">k</span> runs finds a minimum cut.</p>
+<p>The probability that all <span class="math inline">k</span> runs fail is:</p>
+<p><span class="math display">
+\begin{aligned}
+P[\text{all }k\text{ runs fail}] &amp;= P[F]^k \\
+&amp;\leq \left(e^{-2/(n(n-1))}\right)^k \\
+&amp;=e^{-2k/(n(n-1))}.
+\end{aligned}
+</span></p>
+<p>To make this failure probability at most <span class="math inline">\delta</span>, we require:</p>
+<p><span class="math display">
+e^{-2k/(n(n-1))}\leq\delta.
+</span></p>
+<p>Taking logs on both sides and solving for <span class="math inline">k</span>, we get:</p>
+<p><span class="math display">
+k\geq\frac{n(n-1)}{2}\ln\frac{1}{\delta}.
+</span></p>
+<p>Thus, it suffices to choose:</p>
+<p><span class="math display">
+k=\left\lceil\frac{n(n-1)}{2}\ln\frac{1}{\delta}\right\rceil.
+</span></p>
+<p>To get to a <span class="math inline">1\%</span> failure bound, given by <span class="math inline">\delta=0.01</span>, for our graph with <span class="math inline">n=5</span>, we will need:</p>
+<p><span class="math display">
+k=\left\lceil\frac{5(5-1)}{2}\ln\frac{1}{0.01}\right\rceil=47 \text{ independent runs}.
+</span></p>
 </section>
-<section id="next-section" class="level2">
-<h2 class="anchored" data-anchor-id="next-section">Next section</h2>
-<p>Continue the explainer here. Add another heading by starting a line with <code>##</code>.</p>
+<section id="running-time" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="running-time"><span class="header-section-number">2.2</span> Running Time</h2>
+<p>A single run of Karger’s algorithm performs exactly <span class="math inline">n-2</span> edge contractions. Unfortunately, an edge contraction is not a trivial constant time operation. With a suitable graph representation, contraction can be implemented in <span class="math inline">O(n)</span> time. Therefore, one run of Karger’s algorithm takes <span class="math inline">O(n^2)</span> time.</p>
+<p>Running the algorithm independently <span class="math inline">k</span> times therefore takes <span class="math inline">O(kn^2)</span> time.</p>
+<p>So far, both algorithms that we’ve discussed have a probability of failing. Can there be randomized algorithms that always run correctly? Yes! The next problem describes one such algorithm.</p>
+</section>
+</section>
+<section id="fast-sorting" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Fast sorting</h1>
+<p>Sorting a set of numbers is among the most fundamental problems in computer science.</p>
+<p>In sorting you have a list of numbers and you want to arrange them in increasing or decreasing order.</p>
+<p>Assume you get an input list of numbers A.</p>
+<p>Here’s an algorithm -</p>
+<ol type="1">
+<li>If <span class="math inline">A</span> contains at most one element, return <span class="math inline">A</span>.</li>
+<li>Choose an element of <span class="math inline">A</span> as the pivot <span class="math inline">p</span>.</li>
+<li>Partition the remaining elements of <span class="math inline">A</span> into two lists: <span class="math inline">L</span>, containing every element less than or equal to <span class="math inline">p</span>, and <span class="math inline">R</span>, containing every element greater than <span class="math inline">p</span>.</li>
+<li>Recursively sort <span class="math inline">L</span> and <span class="math inline">R</span> using the same steps 1-3.</li>
+<li>Return the concatenation of the sorted list <span class="math inline">L</span>, the pivot <span class="math inline">p</span>, and the sorted list <span class="math inline">R</span>.</li>
+</ol>
+<div class="quicksort-pivots" data-quicksort-pivot-comparison="">
+  <div class="quicksort-pivots__legend" aria-label="Quicksort pivot diagram legend">
+    <span><span class="quicksort-pivots__legend-cell is-pivot" aria-hidden="true"></span>Selected pivot</span>
+    <span><span class="quicksort-pivots__legend-cell" aria-hidden="true"></span>Other element</span>
+    <span><span class="quicksort-pivots__legend-empty" aria-hidden="true">∅</span>Empty partition</span>
+  </div>
+
+  <div class="quicksort-pivots__figures">
+    <figure class="quicksort-pivots__figure figure" data-quicksort-scenario="balanced">
+      <figcaption class="quicksort-pivots__caption">
+        <span class="quicksort-pivots__caption-title">Balanced pivot choices</span>
+        <span class="quicksort-pivots__caption-detail">Always choose the median value, so both partitions have the same size.</span>
+      </figcaption>
+      <div class="quicksort-pivots__canvas" data-role="quicksort-canvas"></div>
+    </figure>
+
+    <figure class="quicksort-pivots__figure figure" data-quicksort-scenario="poor-right">
+      <figcaption class="quicksort-pivots__caption">
+        <span class="quicksort-pivots__caption-title">A poor pivot subtree</span>
+        <span class="quicksort-pivots__caption-detail">After choosing 8, repeatedly choose the smallest value in the right partition.</span>
+      </figcaption>
+      <div class="quicksort-pivots__canvas" data-role="quicksort-canvas"></div>
+    </figure>
+  </div>
+</div>
+
+<script type="module" src="interactives/quicksort-pivot-comparison.js"></script>
+</section>
+<section id="challenges" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Challenges</h1>
+<p>Before I conclude this explainer, I must warn you. As I hope these algorithms have demonstrated, randomized algorithms can be remarkably simple. The algorithms we’ve discussed have minimal steps, and don’t even do any complex operations over the random choice. The random experiment we do to make our random choice (like sampling from a uniform distribution) is also a simple experiment.</p>
+<p>You must not confuse this simplicity with easiness. If you’ve learnt enough math, you’ll know that often the simplest ideas are the hardest things to come up with.</p>
+<p>When I mentioned the <a href="#general-randomized-algorithm-process">general three-step process to come up with a randomized algorithm</a>, I used the words “good enough.” Let’s expound on what that means.</p>
+<p>For a randomized algorithm of the kind we have discussed to be useful, we need two things:</p>
+<div class="key-observations">
+<ol type="1">
+<li><p>For the random choice we decide to make, we must be able to come up with an expression that bounds the probability of failure:</p>
+<p>This is hard. Even though the algorithms we discussed were simple, the way we went about deriving the failure bounds for the algorithms was not obvious. If you’re inspired after reading the explainer and decide to solve a few problems on constructing a randomized algorithm, you’ll immediately run into this issue.</p></li>
+<li><p>In general, if one run takes time <span class="math inline">T</span> and we amplify by running the algorithm <span class="math inline">k</span> times, the total running time of the algorithm is <span class="math inline">O(kT)</span>. This tells us that, for the algorithm to work practically, one run should be quick enough and the function that bounds the failure probability from above should vanish toward 0 quickly enough on repeated runs of the algorithm. If either of these conditions is false, the algorithm might be impractical because it’d simply take too much time to run for a good enough probability bound!</p></li>
+</ol>
+</div>
+<p>Let’s talk about the second point in more detail. We go back to the <a href="#problem-matrix-multiplication-verification">Matrix Multiplication Verification problem</a>. This time, we consider a different randomized algorithm to solve it:</p>
+<div id="algorithm-random-column-verification" class="algorithm-statement">
+<p><span class="algorithm-title">Random Column Verification</span></p>
+<ol type="1">
+<li>Sample a column index <span class="math inline">j \in \{1,2,\ldots,d\}</span> uniformly at random.</li>
+<li>Compute the <span class="math inline">j^{\text{th}}</span> column of <span class="math inline">AB</span> by computing <span class="math inline">AB_{:,j}=A(B_{:,j})</span>.</li>
+<li>If <span class="math inline">AB_{:,j}=C_{:,j}</span>, we say that <span class="math inline">AB=C</span>; otherwise, we say that <span class="math inline">AB\neq C</span>.</li>
+</ol>
+</div>
+<p>Let <span class="math inline">F</span> be the event that the algorithm fails.</p>
+<p>Let <span class="math inline">D = AB - C</span>. We notice that, like Freivalds’ algorithm, this algorithm fails only when <span class="math inline">AB \neq C \iff D \neq 0</span>. Thus to compute the probability of failure we fix <span class="math inline">A, B, C</span> such that <span class="math inline">AB \neq C</span></p>
+<p>If we sample <span class="math inline">j</span> such that <span class="math inline">D_{:,j} = AB_{:,j} - C_{:,j} \neq 0</span> then our algorithm correctly reports that <span class="math inline">AB \neq C</span>.</p>
+<p>It’s only when <span class="math inline">D_{:,j} = 0</span> that the algorithm fails by incorrectly saying that <span class="math inline">AB = C</span>.</p>
+<p>Thus <span class="math inline">F = \left\{j \in \{1, \dots, d\} \mid D_{:,j} = 0\right\}</span>.</p>
+<p><span class="math display">
+P[F] = P[D_{:,j} = 0]
+</span></p>
+<p>Let <span class="math inline">t</span> be the number of nonzero columns in <span class="math inline">D</span>. Since <span class="math inline">D \neq 0</span>, it contains at least one nonzero column.</p>
+<p><span class="math display">
+1 \leq t \leq d
+</span></p>
+<p>The probability of failure becomes</p>
+<p><span class="math display">
+\begin{aligned}
+P[F] &amp;= \frac{d-t}{d} \\
+&amp;= 1-\frac{t}{d} \\
+&amp; \leq 1 - \frac{1}{d} \\
+&amp; = \frac{d-1}{d}
+\end{aligned}
+</span></p>
+<p>Compared to the Freivalds’ flat bound of <span class="math inline">\frac{1}{2}</span>, this absolutely sucks. Under amplification, this bound also decreases extremely slowly, and it will take many runs to reduce the failure probability to an acceptable amount.</p>
+<p>For a concrete example, let’s go back to multiplying two <span class="math inline">3000 \times 3000</span> matrices on a Compaq Deskpro 386/20 having 160,000 FLOPs per second.</p>
+<p>To compute the <span class="math inline">j^{\text{th}}</span> column of <span class="math inline">AB</span>, we multiply the <span class="math inline">d \times d</span> matrix <span class="math inline">A</span> by the <span class="math inline">d \times 1</span> matrix <span class="math inline">B_{:,j}</span>. From our <a href="#eq-compatible-matrix-multiplication-flops">previous derivation of the FLOPs for multiplying two compatible matrices</a>, multiplying an <span class="math inline">a \times b</span> matrix by a <span class="math inline">b \times c</span> matrix takes:</p>
+<p><span class="math display">
+a \times c \times (2b-1) \text{ FLOPs}.
+</span></p>
+<p>In this case, <span class="math inline">a=d</span>, <span class="math inline">b=d</span>, and <span class="math inline">c=1</span>. Thus the total FLOPs in one run are:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Total FLOPs}
+  &amp;= d \times 1 \times (2d-1) \\
+  &amp;= 2d^2-d
+\end{aligned}
+</span></p>
+<p>In our case,</p>
+<p><span class="math display">
+\begin{aligned}
+d &amp;= 3000 \\
+\text{Total FLOPs}
+  &amp;= 3000 \times 1 \times (2\times 3000-1) \\
+  &amp;= \boxed{17{,}997{,}000\text{ FLOPs}}.
+\end{aligned}
+</span></p>
+<p>If you compare it with the total FLOPs for one run of Freivalds’ algorithm, it is significantly less (<span class="math inline">\approx 18</span> million vs <span class="math inline">\approx 54</span> million).</p>
+<p>This suggests that one run of this algorithm is significantly faster than one run of Freivalds’ algorithm.</p>
+<p>However, its probability bounds suck. At <span class="math inline">d = 3000</span>, the probability we fail is at most <span class="math inline">\frac{2999}{3000} \approx 0.99967</span>! That’s as bad as it gets.</p>
+<p>Let’s see how amplification works for this algorithm.</p>
+<p>Let <span class="math inline">F_i</span> be the event that the <span class="math inline">i^{\text{th}}</span> run fails, and let <span class="math inline">F^{(k)}</span> be the event that the amplified <span class="math inline">k</span>-run algorithm fails. If we run the algorithm <span class="math inline">k</span> times, we fail only if every run fails. The probability of failure becomes:</p>
+<p><span class="math display">
+\begin{aligned}
+P[F^{(k)}]
+  &amp;= P[F_1 \cap F_2 \cap \dots \cap F_k] \\
+  &amp;= P[F_1] \times P[F_2] \times \dots \times P[F_k] \\
+  &amp;\leq \left(\frac{d-1}{d}\right)^k.
+\end{aligned}
+</span></p>
+<p>If we want the probability of failure to be at most <span class="math inline">\delta</span>, where <span class="math inline">1&gt;\delta&gt;0</span>, we need:</p>
+<p><span class="math display">
+\left(\frac{d-1}{d}\right)^k \leq \delta.
+</span></p>
+<p>Taking the natural logarithm of both sides, we get:</p>
+<p><span class="math display">
+k\ln\left(\frac{d-1}{d}\right) \leq \ln(\delta).
+</span></p>
+<p>Since <span class="math inline">\ln\left(\frac{d-1}{d}\right)&lt;0</span>, dividing both sides by it reverses the inequality. Thus:</p>
+<p><span class="math display">
+k \geq \frac{\ln(\delta)}{\ln\left(\frac{d-1}{d}\right)}.
+</span></p>
+<p>Therefore, to get the probability of failure to be at most <span class="math inline">\delta</span>, we need to repeat the algorithm</p>
+<p><span class="math display">
+k=\left\lceil\frac{\ln(\delta)}{\ln\left(\frac{d-1}{d}\right)}\right\rceil
+</span></p>
+<p>times.</p>
+<p>For our <span class="math inline">d=3000</span> matrices, suppose we want the probability of failure to be at most <span class="math inline">10\%</span>, given by <span class="math inline">\delta=0.1</span>. We will need:</p>
+<p><span class="math display">
+\begin{aligned}
+k
+  &amp;= \left\lceil\frac{\ln(0.1)}{\ln\left(\frac{2999}{3000}\right)}\right\rceil \\
+  &amp;= \boxed{6907\text{ independent runs}}.
+\end{aligned}
+</span></p>
+<p>Since one run takes <span class="math inline">17{,}997{,}000</span> FLOPs, the total FLOPs are:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Total FLOPs}
+  &amp;= 6907 \times 17{,}997{,}000 \\
+  &amp;= \boxed{124{,}305{,}279{,}000\text{ FLOPs}}.
+\end{aligned}
+</span></p>
+<p>The time your computer would take to carry out all <span class="math inline">6907</span> runs is given by:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Time taken by Compaq 386/20}
+  &amp;= \frac{\text{Total FLOPs}}{\text{FLOPs per second}} \\
+  &amp;= \frac{124{,}305{,}279{,}000}{160{,}000} \\
+  &amp;= 776{,}907.99375\,\text{seconds} \\
+  &amp;\approx 215.81\,\text{hours} \\
+  &amp;\approx \boxed{8.99\,\text{days}}.
+\end{aligned}
+</span></p>
+<p>That’s even more impractical than the 4 days it’d take you to compute <span class="math inline">AB</span> directly!</p>
+<p>What went wrong with this algorithm? The amplified probability bound <span class="math inline">\left(\frac{d-1}{d}\right)^k</span> simply decreases too slowly as <span class="math inline">k</span> grows.</p>
+<p>This algorithm succumbs to the second challenge of being practical, because it fails at having a probability bound that vanishes quickly enough.</p>
+<p>I hope these two challenges - the second one in particular - have given you a sense of how hard designing a practical, working randomized algorithm is.</p>
+</section>
+<section id="conclusion" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Conclusion</h1>
+<p>If you’ve read this explainer till here, thank you for sticking around! I remember the feeling of disbelief and wonder when I first studied Randomized Algorithms, and I hope I’ve been able to instill that feeling through this explainer.</p>
+<p>If you enjoyed reading this, I suggest reading the book Probability and Computing. I could not cover a lot of algorithms that I think are really cool. I’ll list them here for you to check: (1) Johnson-Lindstrauss dimensionality reduction (2) Morris counter</p>
 
 
+<div id="annotation-definitions" class="annotation-definitions" hidden="hidden">
+<div id="annotation-definition-binary-vectors" class="annotation-definition" data-annotation-definition="binary-vectors">
+<div class="annotation-definition__title">
+Binary vectors
+</div>
+<div class="annotation-definition__content">
+<p><span class="math inline">\{0,1\}^d</span> is the set of all length-<span class="math inline">d</span> vectors whose entries are either <span class="math inline">0</span> or <span class="math inline">1</span>. For example, <span class="math inline">\{0,1\}^2 = \{(0,0),(0,1),(1,0),(1,1)\}</span>. For <span class="math inline">d=3</span>, examples include <span class="math inline">(0,0,0)</span>, <span class="math inline">(1,0,1)</span>, and <span class="math inline">(1,1,1)</span>; there are <span class="math inline">8</span> vectors in total.</p>
+</div>
+</div>
+<div id="annotation-definition-compaq-386-linpack-performance" class="annotation-definition" data-annotation-definition="compaq-386-linpack-performance">
+<div class="annotation-definition__title">
+Compaq 386/20 benchmark performance
+</div>
+<div class="annotation-definition__content">
+<p>Dongarra’s LINPACK table reports <span class="math inline">0.16</span> Mflop/s for a Compaq 386/20 with an Intel 80387 math coprocessor, using Microsoft Fortran 4.1 on the <span class="math inline">n=100</span> benchmark. Since <span class="math inline">1</span> Mflop/s is <span class="math inline">10^6</span> floating-point operations per second, this is <span class="math inline">160{,}000</span> FLOP/s. Source: <a href="https://icl.utk.edu/projectsfiles/rib/pubs/performance.pdf">Jack J. Dongarra, <em>Performance of Various Computers Using Standard Linear Equations Software</em>, University of Tennessee Computer Science Technical Report CS-89-85</a>; also published in <a href="https://doi.org/10.1145/141868.141871"><em>ACM SIGARCH Computer Architecture News</em></a>.</p>
+</div>
+</div>
+<div id="annotation-definition-floating-point-operation" class="annotation-definition" data-annotation-definition="floating-point-operation">
+<div class="annotation-definition__title">
+Floating-point operations (FLOPs)
+</div>
+<div class="annotation-definition__content">
+<p>FLOP stands for floating-point operation, and FLOPs is its plural. A floating-point operation is an arithmetic operation on a real number, such as <span class="math inline">+</span>, <span class="math inline">-</span>, <span class="math inline">\times</span>, or <span class="math inline">\div</span>. For example, to compute <span class="math inline">2 + 2 \times 5</span>, we perform two floating-point operations: one addition and one multiplication. A rate of <span class="math inline">160{,}000</span> FLOPs per second means <span class="math inline">160{,}000</span> such operations per second.</p>
+</div>
+</div>
+<div id="annotation-definition-real-matrices" class="annotation-definition" data-annotation-definition="real-matrices">
+<div class="annotation-definition__title">
+Real-valued matrices
+</div>
+<div class="annotation-definition__content">
+<p><span class="math inline">\mathbb{R}^{d \times d}</span> is the set of all <span class="math inline">d \times d</span> matrices whose entries are real numbers. Thus <span class="math inline">A \in \mathbb{R}^{d \times d}</span> means that <span class="math inline">A</span> is such a matrix.</p>
+</div>
+</div>
+<div id="annotation-definition-uniform-sampling" class="annotation-definition" data-annotation-definition="uniform-sampling">
+<div class="annotation-definition__title">
+Uniform sampling
+</div>
+<div class="annotation-definition__content">
+<p>Sampling uniformly at random from a finite set <span class="math inline">S</span> means that every element of <span class="math inline">S</span> is selected with the same probability, namely <span class="math inline">1/|S|</span>.</p>
+</div>
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -280,7 +1053,7 @@ window.Quarto = {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/kmehta2012\.github\.io\/Randomized-Algs-Explainer\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -613,4 +1386,5 @@ window.Quarto = {
 
 
 <script src="site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="site_libs/quarto-contrib/explain-annotations-0.1.0/explain.js"></script>
 </body></html>

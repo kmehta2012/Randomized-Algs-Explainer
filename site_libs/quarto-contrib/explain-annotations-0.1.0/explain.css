@@ -1,0 +1,85 @@
+:root {
+  --annotation-accent: #733f36;
+  --annotation-border: #d8c4c0;
+  --annotation-background: #fbf5f3;
+  --annotation-highlight: #f8eae7;
+  --annotation-ink: #2b211f;
+}
+
+.explain,
+.annotation-trigger {
+  border-bottom: 2px dotted var(--annotation-accent);
+  border-radius: 0.08rem;
+  cursor: help;
+  text-decoration: none;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.explain:hover,
+.annotation-trigger:hover,
+.explain[aria-expanded="true"],
+.annotation-trigger[aria-expanded="true"] {
+  background: var(--annotation-highlight);
+}
+
+.explain:focus-visible,
+.annotation-trigger:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--annotation-accent) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.explain-math.display {
+  display: block;
+}
+
+.annotation-popover {
+  position: fixed;
+  z-index: 1085;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1rem 1.05rem 1rem 1.15rem;
+  border: 1px solid var(--annotation-border);
+  border-left: 4px solid var(--annotation-accent);
+  border-radius: 0.25rem;
+  background: var(--annotation-background);
+  color: var(--annotation-ink);
+  box-shadow: 0 2px 7px rgb(43 33 31 / 10%);
+  line-height: 1.55;
+}
+
+.annotation-popover[hidden] {
+  display: none;
+}
+
+.annotation-popover.is-positioning {
+  visibility: hidden;
+}
+
+.annotation-popover .annotation-definition__title {
+  margin: 0 0 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.annotation-popover .annotation-definition__content > :first-child {
+  margin-top: 0;
+}
+
+.annotation-popover .annotation-definition__content > :last-child {
+  margin-bottom: 0;
+}
+
+.annotation-popover .katex-display {
+  margin: 0.65rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explain,
+  .annotation-trigger {
+    transition: none;
+  }
+}
