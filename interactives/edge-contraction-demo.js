@@ -1,24 +1,14 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-const GRAPH_WIDTH = 300;
-const GRAPH_HEIGHT = 240;
-const DEFAULT_EDGE_ID = "AC";
+import { KARGER_GRAPH } from "./karger-graph.js";
+
+const GRAPH_WIDTH = KARGER_GRAPH.width;
+const GRAPH_HEIGHT = KARGER_GRAPH.height;
+const DEFAULT_EDGE_ID = "13";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-const vertices = [
-  { id: "A", x: 55, y: 50 },
-  { id: "B", x: 245, y: 50 },
-  { id: "C", x: 245, y: 190 },
-  { id: "D", x: 55, y: 190 },
-];
-
-const edges = [
-  { id: "AB", from: "A", to: "B" },
-  { id: "BC", from: "B", to: "C" },
-  { id: "CD", from: "C", to: "D" },
-  { id: "DA", from: "D", to: "A" },
-  { id: "AC", from: "A", to: "C" },
-];
+const vertices = KARGER_GRAPH.vertices;
+const edges = KARGER_GRAPH.edges;
 
 const edgeById = new Map(edges.map((edge) => [edge.id, edge]));
 
@@ -56,34 +46,32 @@ function contractGraph(edgeId) {
   const selectedEdge = edgeById.get(edgeId);
   const contractedIds = new Set([selectedEdge.from, selectedEdge.to]);
   const orderedMembers = [...contractedIds].sort();
-  const supernodeId = orderedMembers.join("");
+  const supernodeId = orderedMembers.join(",");
   const supernodeLabel = `{${orderedMembers.join(",")}}`;
   const remainingVertices = vertices
     .filter((vertex) => !contractedIds.has(vertex.id))
     .sort((left, right) => left.id.localeCompare(right.id));
 
+  const remainingPositions = [
+    { x: 252, y: 42 },
+    { x: 282, y: 125 },
+    { x: 252, y: 208 },
+  ];
+
   const resultVertices = [
     {
       id: supernodeId,
       label: supernodeLabel,
-      x: 78,
-      y: 120,
+      x: 82,
+      y: 125,
       isSupernode: true,
     },
-    {
-      ...remainingVertices[0],
-      label: remainingVertices[0].id,
-      x: 232,
-      y: 62,
+    ...remainingVertices.map((vertex, index) => ({
+      ...vertex,
+      label: vertex.id,
+      ...remainingPositions[index],
       isSupernode: false,
-    },
-    {
-      ...remainingVertices[1],
-      label: remainingVertices[1].id,
-      x: 232,
-      y: 178,
-      isSupernode: false,
-    },
+    })),
   ];
 
   const remap = (vertexId) =>
@@ -139,8 +127,8 @@ function edgePath(edge, vertexById) {
   const length = Math.hypot(dx, dy);
   const midpointX = (from.x + to.x) / 2;
   const midpointY = (from.y + to.y) / 2;
-  const direction = edge.parallelIndex === 0 ? -1 : 1;
-  const curveOffset = 24 * direction;
+  const centeredIndex = edge.parallelIndex - (edge.parallelCount - 1) / 2;
+  const curveOffset = 38 * centeredIndex;
   const controlX = midpointX - (dy / length) * curveOffset;
   const controlY = midpointY + (dx / length) * curveOffset;
 
@@ -173,11 +161,14 @@ function initializeDemo(demo, index) {
     originalCanvas,
     instanceId,
     "original",
-    "Original graph before edge contraction",
+    "Original Karger graph before edge contraction",
   );
 
+  originalCanvas.dataset.nodeCount = String(vertices.length);
+  originalCanvas.dataset.edgeCount = String(edges.length);
+
   originalGraph.description.text(
-    "A square with vertices A, B, C, and D and a diagonal edge from A to C.",
+    "The five-vertex Karger graph. Vertices 1, 2, 3, and 4 form a complete graph, and vertex 5 is connected to vertices 3 and 4. Edge 1–3 is selected for contraction.",
   );
 
   const originalEdgeSelection = originalGraph.svg
@@ -187,7 +178,7 @@ function initializeDemo(demo, index) {
     .data(edges)
     .join("line")
     .attr("class", "edge-contraction__edge")
-    .attr("x1", (edge) => edgeById.get(edge.id) && vertices.find((vertex) => vertex.id === edge.from).x)
+    .attr("x1", (edge) => vertices.find((vertex) => vertex.id === edge.from).x)
     .attr("y1", (edge) => vertices.find((vertex) => vertex.id === edge.from).y)
     .attr("x2", (edge) => vertices.find((vertex) => vertex.id === edge.to).x)
     .attr("y2", (edge) => vertices.find((vertex) => vertex.id === edge.to).y)
@@ -211,8 +202,9 @@ function initializeDemo(demo, index) {
     .data(vertices)
     .join("text")
     .attr("class", "edge-contraction__label")
-    .attr("x", (vertex) => vertex.x)
-    .attr("y", (vertex) => (vertex.y < GRAPH_HEIGHT / 2 ? vertex.y - 27 : vertex.y + 38))
+    .attr("x", (vertex) => vertex.labelX)
+    .attr("y", (vertex) => vertex.labelY)
+    .attr("text-anchor", (vertex) => vertex.labelAnchor)
     .text((vertex) => vertex.id);
 
   const arrowSvg = d3
@@ -320,7 +312,7 @@ function initializeDemo(demo, index) {
       (vertex) => selectedVertices.has(vertex.id),
     );
     originalGraph.description.text(
-      `A square with vertices A, B, C, and D. Edge ${edgeName(selectedEdge)} is selected for contraction.`,
+      `The five-vertex Karger graph. Edge ${edgeName(selectedEdge)} is selected for contraction.`,
     );
     transitionTitle.textContent = `Contract ${edgeName(selectedEdge)}`;
   }
@@ -350,6 +342,9 @@ function initializeDemo(demo, index) {
   function clearContractedGraph() {
     contractedCanvas.replaceChildren();
     contractedCanvas.classList.add("is-empty");
+    delete contractedCanvas.dataset.nodeCount;
+    delete contractedCanvas.dataset.edgeCount;
+    delete contractedCanvas.dataset.originalEdgeIds;
   }
 
   function renderContractedGraph(result, initiallyHidden) {
@@ -372,6 +367,12 @@ function initializeDemo(demo, index) {
       `${result.selectedEdge.from} and ${result.selectedEdge.to} form supernode ${result.supernodeLabel}. ` +
         `${parallelSummary.length > 0 ? "Parallel edges are retained." : "No parallel edges are created."}`,
     );
+
+    contractedCanvas.dataset.nodeCount = String(result.vertices.length);
+    contractedCanvas.dataset.edgeCount = String(result.edges.length);
+    contractedCanvas.dataset.originalEdgeIds = result.edges
+      .map((edge) => edge.originalId)
+      .join(",");
 
     const edgeSelection = contractedGraph.svg
       .append("g")
@@ -405,13 +406,11 @@ function initializeDemo(demo, index) {
       .append("text")
       .attr("class", (vertex) =>
         vertex.isSupernode
-          ? "edge-contraction__label edge-contraction__label--inside"
-          : "edge-contraction__label",
+          ? "edge-contraction__label edge-contraction__label--inside edge-contraction__label--supernode"
+          : "edge-contraction__label edge-contraction__label--inside",
       )
       .attr("x", (vertex) => vertex.x)
-      .attr("y", (vertex) =>
-        vertex.isSupernode ? vertex.y : vertex.y < GRAPH_HEIGHT / 2 ? vertex.y - 27 : vertex.y + 38,
-      )
+      .attr("y", (vertex) => vertex.y)
       .text((vertex) => vertex.label);
 
     contractedCanvas.classList.remove("is-empty");
@@ -558,7 +557,7 @@ function initializeDemo(demo, index) {
     updateOriginalSelection();
     resetArrow();
     clearContractedGraph();
-    status.textContent = "Diagonal edge A–C is selected.";
+    status.textContent = "Edge 1–3 is selected.";
   });
 
   updateOriginalSelection();

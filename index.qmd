@@ -60,7 +60,7 @@ $$
 \end{aligned}
 $$
 
-Computing just one pair of $3000 \times 3000$ matrix product would take you close to 4 days! 
+Multiplying just one pair of $3000 \times 3000$ matrices would take close to four days!
 
 Realizing the impracticality, you go to a supercomputer provider and pay them to compute the answer for you. They give you the answer, the matrix, $C$. 
 
@@ -70,7 +70,7 @@ This is what we call the *matrix multiplication verification problem (MMV)*.
 
 Here it is stated more formally:
 
-::: {#mvp .problem-statement}
+::: {#problem-matrix-multiplication-verification .problem-statement}
 
 [Matrix Multiplication Verification (MMV)]{.problem-title}
 
@@ -88,11 +88,11 @@ Here's an algorithm idea -
 
 1. Sample a vector $v \in \explain{binary-vectors}{\{0,1\}^d}$ [uniformly at random]{.explain data-annotation="uniform-sampling"}.
 2. Compute $A(Bv)$ and $Cv$.
-3. If $A(Bv)=Cv$, we say that the $AB=C$, else we say $AB\neq C$.
+3. If $A(Bv)=Cv$, we say that $AB=C$, else we say $AB\neq C$.
 
 :::
 
-Frievalds' algorithm is an example of what we call a randomized algorithm. The first step of the algorithm involves a random choice where we randomly choose a vector from the set $\{0,1\}^d$. Let's state the definition precisely:
+Freivalds' algorithm is an example of what we call a randomized algorithm. The first step of the algorithm involves a random choice where we randomly choose a vector from the set $\{0,1\}^d$. Let's state the definition precisely:
 
 ::: {#definition-randomized-algorithm .definition-statement}
 
@@ -102,7 +102,7 @@ A randomized algorithm is an algorithm that uses one or more random choices as p
 
 :::
 
-When I first encountered Frievalds' in my studies, I was in disbelief. How can multiplying the matrices on a random vector give us any sort of confidence on whether the matrices in question are equal? This couldn't possibly work. It's too simple for a problem that seems more complicated. But it somehow does work. 
+When I first encountered Freivalds' in my studies, I was in disbelief. How can multiplying the matrices on a random vector give us any sort of confidence on whether the matrices in question are equal? This couldn't possibly work. It's too simple for a problem that seems more complicated. But it somehow does work. 
 
 This is a common theme in randomized algorithms, seemingly complicated problems have absurdly simple solutions. This feeling of disbelief and wonder is precisely why randomized algorithms are my favourite class of algorithms. 
 
@@ -121,7 +121,7 @@ $$
 \end{aligned}
 $$
 
-Since all the products are bewteen $d \times d$ matrix ($A$, $B$, $C$) and a $d \times 1$ matrix ($Bv$, $v$), they take the same FLOPs given by:
+Since all the products are between $d \times d$ matrices ($A$, $B$, $C$) and $d \times 1$ matrices ($Bv$, $v$), they take the same FLOPs given by:
 
 $$
 d \times 1 \times (2d - 1) = 2d^2 - d.
@@ -167,9 +167,9 @@ $$
 \end{aligned}
 $$
 
-Compared to computing $AB$ yourself, which would take $4$ days, you can now run this algorithm to verify $AB = C$ in a measly 5 minutes! This is amazing! It's almost too good to be true. Unfortunately, it is indeed to good to be true. 
+Compared to computing $AB$ yourself, which would take $4$ days, you can now run this algorithm to verify $AB = C$ in a measly 5.62 minutes! This is amazing! It's almost too good to be true. Unfortunately, it is indeed too good to be true. 
 
-if $AB \neq C$, we can come up with vector $v$ such that that $ABv = Cv$. Here's an example of a Freivalds' Algorithm iteration that fails:
+If $AB \neq C$, we can come up with a vector $v$ such that $ABv = Cv$. Here's an example of a Freivalds' Algorithm iteration that fails:
 
 :::: {#example-freivalds-misleading-agreement}
 
@@ -267,22 +267,22 @@ $$
 
 So what do we do now? 
 
-The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing : be extrememly confident, accepting a small chance that we're wrong. 
+The key is to remember that we want to be more *confident* about whether $AB = C$. Being absolutely sure would be the best case, but since it is impractical to compute $AB$ ourselves, we can settle for the next best thing: be extremely confident, accepting a small chance that we're wrong. 
 
 This is our cue to think in probabilities. What is the probability that this algorithm gives us the wrong result? If we can somehow compute this number and it is low enough, we can be happy. Let's analyse this:
 
 Let $D = AB-C$. Thus $D=0 \Leftrightarrow AB=C$.
 
-Since the algorithm only fails when $D \neq 0$ and we sample $v \in \{0,1\}^d$ s.t. $Dv=0$, we find the prob. of sampling such a vector $v$.
+The algorithm can fail only when $AB \neq C$, equivalently $D \neq 0$. We fix the inputs $A, B, C$ to the algorithm such that $AB \neq C$. All probabilities below then are over the randomly sampled vector $v$. The algorithm fails if it claims that $AB=C$. Let $F = \{v \in \{0,1\}^d | Dv = 0\}$. The probability of failure then is exactly $P[F] = P[Dv = 0]$.
 
 Let $r_k$ be the $k^{\text{th}}$ entry of the $d \times 1$ matrix $Dv$.
 
 $$
 \begin{aligned}
-P[\text{Failure}]
+P[F]
   &= P[Dv=0] \\
   &= P[r_1=0 \cap r_2=0 \cap \cdots \cap r_d=0] \\
-  &\leq P[r_j=0], \quad \text{for any } j \in \{1,2,\ldots,d\}
+  &\leq P[r_k=0], \quad \text{for any } k \in \{1,2,\ldots,d\}
 \end{aligned}
 $$ {#eq-freivalds-failure-coordinate}
 
@@ -291,39 +291,32 @@ Since $D \neq 0$, there is at least one non-zero entry in $D$. Say the $(i,j)^{\
 By definition of matrix multiplication:
 
 $$
-r_i = \sum_{k=1}^{d} D_{i,k}v_k = D_{i,j}v_j+y, \quad \text{where } y \in \mathbb{R}
+r_i = \sum_{k=1}^{d} D_{i,k}v_k = D_{i,j}v_j+Y, \quad \text{where } Y := \sum_{\substack{k=1 \\ k\neq j}}^{d} D_{i,k}v_k \text{ is a random variable}
 $$
 
-Let's compute the Probability that $r_i=0$.
+Let's compute the probability that $r_i=0$.
 
-Since $y$ could be either zero or non-zero. We can condition over that and use the law of total probability to get:
+For every sampled vector $v$, exactly one of $Y=0$ and $Y\neq0$ occurs. Therefore, the law of total probability gives:
 
 $$
 \begin{aligned}
 P[r_i=0]
-  &= P[(y \neq 0 \cap r_i=0) \cup (y=0 \cap r_i=0)] \\
-  &= P[r_i=0 \mid y \neq 0]P[y \neq 0] + P[r_i=0 \mid y=0]P[y=0]
+  &= P[(Y \neq 0 \cap r_i=0) \cup (Y=0 \cap r_i=0)] \\
+  &= P[r_i=0 \mid Y \neq 0]P[Y \neq 0] + P[r_i=0 \mid Y=0]P[Y=0]
 \end{aligned}
 $$ {#eq-freivalds-total-probability}
 
 $$
-P[r_i=0 \mid y=0] = P\left[v_j=-\frac{y}{D_{i,j}}\right]P[y=0]
+P[r_i=0 \mid Y \neq 0] = P\left[v_j=-\frac{Y}{D_{i,j}} \mid Y \neq 0\right]
 $$
 
-Since $-\frac{y}{D_{i,j}} \in \mathbb{R}$ and $v_j \in \{0,1\}$;
-
+If $-\frac{Y}{D_{i,j}} \in \{0,1\}$ then $P[v_j = -\frac{Y}{D_{i,j}} \mid Y \neq 0] = \frac{1}{2}$. If $-\frac{Y}{D_{i,j}} \in \mathbb{R} \setminus \{0,1\}$, $P[v_j = -\frac{Y}{D_{i,j}} \mid Y \neq 0] = 0$. Thus we get: 
 $$
-P\left[v_j=-\frac{y}{D_{i,j}}\right] \leq \frac{1}{2}
-$$
-
-Thus,
-
-$$
-P[r_i=0 \mid y=0] \leq \frac{1}{2}P[y=0]
+P[r_i=0 \mid Y \neq 0] = P\left[v_j=-\frac{Y}{D_{i,j}} \mid Y \neq 0\right] \leq \frac{1}{2}
 $$ {#eq-freivalds-first-case}
 
 $$
-P[r_i=0 \mid y=0] = P[v_j=0] = \frac{1}{2}
+P[r_i=0 \mid Y=0] = P[v_j=0] = \frac{1}{2}
 $$ {#eq-freivalds-second-case}
 
 Substituting @eq-freivalds-first-case and @eq-freivalds-second-case into @eq-freivalds-total-probability, we get:
@@ -331,8 +324,8 @@ Substituting @eq-freivalds-first-case and @eq-freivalds-second-case into @eq-fre
 $$
 \begin{aligned}
 P[r_i=0]
-  &\leq \frac{1}{2}P[y \neq 0] + \frac{1}{2}P[y=0] \\
-  &= \frac{1}{2}\left[P[y \neq 0] + P[y=0]\right] \\
+  &\leq \frac{1}{2}P[Y \neq 0] + \frac{1}{2}P[Y=0] \\
+  &= \frac{1}{2}\left[P[Y \neq 0] + P[Y=0]\right] \\
   &= \frac{1}{2}
 \end{aligned}
 $$
@@ -340,45 +333,55 @@ $$
 From @eq-freivalds-failure-coordinate:
 
 $$
-P[\text{Failure}] \leq P[r_i=0] = \frac{1}{2}
+P[F] \leq P[r_i=0] \leq \frac{1}{2}
 $$
 
 Thus
 
 $$
-\boxed{P[\text{Failure}] \leq \frac{1}{2}}
+\boxed{P[F] \leq \frac{1}{2}}
 $$
 
-So the probability that one iteration of Freivalds' gives us the wrong answer is atmost $\frac{1}{2}$. That is not that good. 
+So the probability that one iteration of Freivalds' gives us the wrong answer is at most $\frac{1}{2}$. That is not that good. 
 
-Hence we come to the sledgehammer of Randomized Algorithms: *amplificatoin*. Sure, one iteration of Freivalds' is not that reliable. But, we can just repeat the algorithm as many times we like. 
+Hence we come to the sledgehammer of Randomized Algorithms: *amplification*. Sure, one iteration of Freivalds' is not that reliable. But we can repeat the algorithm as many times as we like. Let's make this idea formal:
 
-If $AB \neq C$ then all it takes for us to know that is for one of the iterations of Freivalds' to sample a vector $v$ such that $AB(v) \neq C$. Each iteration is independent of any other iteration: what vector $v$ was sampled in iteration $i$ has no effect on what vector is sampled in any other iteration $j$. 
+::: {#definition-amplification .definition-statement}
 
-Let $E_i$ be the event that the $i^{th}$ iteration fails. If we repeat the algorithm $k$ times, the probability of failure becomes:
+[Amplification]{.definition-title}
+
+Amplification is a technique for reducing the error probability of a randomized algorithm by running it independently multiple times.
+
+:::
+
+If $AB \neq C$ then all it takes for us to know that is for one of the iterations of Freivalds' to sample a vector $v$ such that $A(Bv) \neq Cv$. Each iteration is independent of any other iteration: what vector $v$ was sampled in iteration $i$ has no effect on what vector is sampled in any other iteration $j$. 
+
+Let $F_i$ be the event that the $i^{\text{th}}$ iteration fails, and let $F^{(k)}$ be the event that the complete $k$-iteration algorithm fails. If we repeat the algorithm $k$ times, we fail only if every iteration fails. The probability of failure becomes:
 
 $$
 \begin{aligned}
- P[Failure] &= P[E_1 \cap E_2 \cap \dots \cap E_k] \\
-&= P[E_1] \times P[E_2] \times \dots \times P[E_k] \\
-&= \frac{{1}/{2^{k}}}
+ P[F^{(k)}] &= P[F_1 \cap F_2 \cap \dots \cap F_k] \\
+&= P[F_1] \times P[F_2] \times \dots \times P[F_k] \\
+&\leq \left(\frac{1}{2}\right)^k \\
+&= \frac{1}{2^k}
 \end{aligned}
 $$
 
-We can thus get the probability of failure arbitarily small. If you want the probability of failure to be atmost $\delta$, where $\frac{1}{2} >= \delta > 0$, we can repeat the algorithm $k = -\log_2(\delta)$ times. 
+We can thus get the probability of failure arbitrarily small. If you want the probability of failure to be at most $\delta$, where $\frac{1}{2} \geq \delta > 0$, we can repeat the algorithm $k = \left\lceil -\log_2(\delta) \right\rceil$ times. 
 
-If you wanted to get the probability of failure to $\frac{1}{2^{10}} \approx \frac{{1}/{1000}} = 0.001$, you need to repeat the algorithm $k = 10$ times, after which you can be much more confident about your verificatoin, having atmost a $0.01 %$ chance of being wrong! 
+If you wanted to get the probability of failure to be at most $\frac{1}{2^{10}} \approx \frac{1}{1000} = 0.001$, you need to repeat the algorithm $k = 10$ times, after which you can be much more confident about your verification, having at most a $0.1\%$ chance of being wrong! 
 
-That is only about $5$ mins $ \times 10 = 50$ mins of work on your Compaq Deskpro 386/20, still a measly amount compared to the 4 days that it'd take you to compute $AB$! 
+That is only about $5.62\text{ minutes} \times 10 = 56.2\text{ minutes}$ of work on your Compaq Deskpro 386/20, still a measly amount compared to the 4 days that it'd take you to compute $AB$! 
 
 This completes our first randomized algorithm. Isn't it exciting? This problem defines well what a particular class of randomized algorithms do:
+
 1. Find a good random choice to make, and make an algorithm around it. 
 2. Analyse the randomized algorithm and hope that the probability bounds of failure are good enough.
-3. Amplify: Do several independent iterations of the randomized algorithm to get the failure probability to zero. 
+3. Amplify: Do several independent iterations of the randomized algorithm to get the failure probability to an arbitrarily small non-zero value. 
 
 What do I mean by 'good enough'? We'll talk about that soon. 
 
-Now we move to another application of randomized algorithms - finding the mininum cut of a graph. This is my favourite graph algorithm, so lock in. 
+Now we move to another application of randomized algorithms - finding the minimum cut of a graph. This is my favourite graph algorithm, so lock in. 
 
 # Problem 2 : Min-Cut of a graph
 
@@ -386,13 +389,19 @@ You’re a computer network administrator and you’ve been tasked by your compa
 
 Here’s a visual of the computer network you’re managing:
 
-(a visual of a computer network)
+```{=html}
+<div class="computer-network" data-computer-network-diagram>
+  <div class="computer-network__canvas" data-role="network-canvas"></div>
+</div>
 
-Each network node represents a computer, and the lines between each network node can be thought of as wires connecting them. In particular, any two nodes A and B in the network are connected and reachable to each other if there is a path of wires that leads us from A to B. 
+<script type="module" src="interactives/computer-network-diagram.js"></script>
+```
 
-One metric we care about is how resistant our network’s connectivity is to damaged wires. In particular, what’s the smallest number of wires that, if they get damaged, would make the network unconnected?
+The lines between each computer represent wires connecting them. In particular, any two computers A and B in the network are connected and reachable to each other if there is a path of wires that leads us from A to B. 
 
-If we think of our computer network as a graph, with the network nodes being vertices and the wires being edges, this metric amounts to finding the minimum cut of the graph. 
+One metric we care about is how resistant our network’s connectivity is to damaged wires. In particular, what’s the smallest number of wires that, if damaged, would make the network unconnected?
+
+If we think of our computer network as a graph, with the computers being vertices and the wires being edges, this metric amounts to finding the minimum cut of the graph.  
 
 Let’s define what a cut is:
 
@@ -409,11 +418,11 @@ A cut $C = (S, T)$ of a graph $G(V, E)$ is a partition of the vertices into two 
 
 [Size of a Cut]{.definition-title}
 
-The size of a cut $C = (S, T)$ is defined as the number of edges $e = (u,v) \in E$ such that $u \in S$ and $v \in T$  
+The size of a cut $C=(S,T)$ is the number of edges with one endpoint in $S$ and the other in $T$. We say that any such edge belongs to the cut $C$, denoted by $e\in C$.
 
 :::
 
-These definitions can feel convoluted without any visuals. Look at the visual below (will add some explanation here for the visuals).
+Let's see different cuts and their cut sizes on our computer network graph.
 
 ```{=html}
 <div class="karger-cuts" data-karger-cut-examples>
@@ -452,19 +461,25 @@ These definitions can feel convoluted without any visuals. Look at the visual be
 
 Now that we understand what a cut is, we can formally state the min-cut problem:
 
-(formally state the problem)
+::: {#problem-minimum-cut .problem-statement}
 
-(A visual for a graph that highlightes the min cut and states the size for that. I need to think about this graph becasue I'll use this for all the future karger visuals.)
+[Minimum Cut]{.problem-title}
 
-There are several deterministic algorithms that can always find the min-cut of a graph. If you've ever read them (for example the one based on finding the max-flow), you'd know those algorithms tend to be really complicated. Randomization, on the other hand, gives us a really simple and elegant algorithm. 
+Given an undirected connected graph $G$, find a minimum cut of $G$.
 
-Before I share this algorithm we need to define what it means to *contract* an edge. Here's the formal definition
+:::
+
+As you may observe, the mininum cut on the computer network graph has size 2, and is defined by the set $S = \{1, 2, 3, 4\}$ and $T = \{5\}. This graph has a unique min-cut, but graphs can have multiple cuts of the same size, and as such have multiple min-cuts. 
+
+There are several deterministic algorithms that can find the min-cut of a graph. If you've ever read them (for example the ones based on finding the max-flow), you'd know those algorithms tend to be complicated. Randomization, on the other hand, gives us a really simple and elegant algorithm. 
+
+Before I share this algorithm we need to define what it means to *contract* an edge. Here's the formal definition:
 
 ::: {#definition-edge-contraction .definition-statement}
 
 [Edge Contraction]{.definition-title}
 
-(Definition of edge contraction goes here.)
+Contracting an edge $e=\{u,v\}$ in a graph $G$ means merging $u$ and $v$ into a single vertex "merged" vertex $w$. Every edge that previously had exactly one of $u$ or $v$ as an endpoint now has $w$ as that endpoint. All edges between $u$ and $v$ disappear.
 
 :::
 
@@ -478,7 +493,7 @@ Before I share this algorithm we need to define what it means to *contract* an e
 
     <div class="edge-contraction__transition" data-role="transition-stage">
       <div class="edge-contraction__transition-title" data-role="transition-title">
-        Contract A–C
+        Contract 1–3
       </div>
       <div class="edge-contraction__arrow" data-role="transition-arrow"></div>
     </div>
@@ -493,11 +508,14 @@ Before I share this algorithm we need to define what it means to *contract* an e
     <label class="edge-contraction__field">
       <span>Edge to contract</span>
       <select data-role="edge-select">
-        <option value="AC" selected>A–C (diagonal)</option>
-        <option value="AB">A–B (top)</option>
-        <option value="BC">B–C (right)</option>
-        <option value="CD">C–D (bottom)</option>
-        <option value="DA">D–A (left)</option>
+        <option value="13" selected>1–3</option>
+        <option value="12">1–2</option>
+        <option value="14">1–4</option>
+        <option value="23">2–3</option>
+        <option value="24">2–4</option>
+        <option value="34">3–4</option>
+        <option value="35">3–5</option>
+        <option value="45">4–5</option>
       </select>
     </label>
     <button class="edge-contraction__button edge-contraction__button--primary" type="button" data-action="run">
@@ -509,18 +527,28 @@ Before I share this algorithm we need to define what it means to *contract* an e
   </div>
 
   <p class="edge-contraction__status" data-role="status" aria-live="polite">
-    Diagonal edge A–C is selected.
+    Edge 1–3 is selected.
   </p>
 </div>
 
 <script type="module" src="interactives/edge-contraction-demo.js"></script>
 ```
+A common confusion is what happens if $e = \{u, v\}$ is one of several parallel edges between $u$ and $v$. As per the definition, any edge that has both $u$ and $v$ as an endpoint will vanish. Thus all the parallel edges dissapear.  
 
 Now we've all the machinery needed to state our randomized algorithm
 
-(define Karger's Algorithm)
+::: {#algorithm-karger .algorithm-statement}
 
-That's it. Does this algorithm always work correctly? Ofcourse not. For the graph G in (previous visual), here are two possible iterations of Karger's algorithm
+[Karger's Algorithm]{.algorithm-title}
+
+1. Repeat until $G$ has exactly two vertices:
+   1. Select an edge in $G$ uniformly at random.
+   2. Contract the selected edge.
+2. Return the unique cut that remains in $G$.
+
+:::
+
+Here are two different iterations of Karger's algorithm on the computer network graph:
 
 ```{=html}
 <div class="karger-runs" data-karger-run-comparison>
@@ -540,7 +568,176 @@ That's it. Does this algorithm always work correctly? Ofcourse not. For the grap
 <script type="module" src="interactives/karger-run-comparison.js"></script>
 ```
 
-It is important to observe two things:
+Just like how we upper bounded the failure probability for Freivalds', let's do the same for Karger. Before we do that, let's establish some notation.
 
-1. Any cut in a later graph, is a cut in our original graph
-2. The algorithm fails precisely 
+Let $|V| = n$ and $|E| = m$. 
+
+Let $G^{(i)}$ denote the graph after $i-1$ contractions. Thus, $G^{(1)}=G$.
+
+Let
+
+$$
+n_i := |V(G^{(i)})|, \qquad m_i := |E(G^{(i)})|
+$$
+
+denote the number of vertices and edges in $G^{(i)}$, respectively. In particular, $n_1=n$ and $m_1=m$. 
+
+It is important to observe three things:
+
+1. Every edge contraction decreases the number of vertices in the graph by 1. Since each iteration of Karger's has exactly one contraction, we have:
+
+$$
+n_i=n-i+1.
+$$
+ 
+
+Moreover, since the algorithm runs till we're left with two vertices - there are exactly $n-2$ edge contractions. 
+
+2. Any cut in $G^{(i)}$ corresponds to a cut of the same size in $G$. Thus, the minimum-cut size of $G^{(i)}$ is greater than or equal to the minimum-cut size of $G$, for all $i$.
+
+What do I mean? Let's make a cut $(S^{(i)},T^{(i)})$ of $G^{(i)}$. Every vertex $v \in V(G^{(i)})$ is either a vertex in $G$ or a merged vertex of the form $v=\{a,b,c,\dots\}$, where every vertex forming $v$ is a vertex in $G$. 
+
+The representation of vertex subset $S^{(i)}$ in graph $G$ is given by "unmerging" every merged vertex and then taking the union of all the vertices in $S^{(i)}$.
+
+$T$ is constructed from $T^{(i)}$ in the same way. 
+
+The edges belonging to the cut $(S,T)$ are precisely the same edges belonging to the cut $(S^{(i)},T^{(i)})$. Hence, the two cuts have the same size.
+
+As an example, let's look at graph $G^{(4)}$ in the successful Karger iteration shown above. The cut it defines is $S^{(4)}=\{\{1,2,3,4\}\}$, $T^{(4)}=\{\{5\}\}$.
+
+In the original graph, this is the cut $S=\{1,2,3,4\}$, $T=\{5\}$. 
+
+There were two edges between $\{1,2,3,4\}$ and $\{5\}$, which correspond exactly to the edges $\{3,5\}$ and $\{4,5\}$ in $G$ that belong to the cut $(S,T)$.
+
+You can see how this cut looks like in both the graphs in the successful iteration version of the visual above. 
+
+3. For any min-cut $C$ in graph $G$, Karger's algorithm fails to find $C$ if it contracts any edge $e \in C$. For example, in the failed Karger run shown in the visual, the algorithm contracted edge $\{3, 5\}$ in graph $G^{(2)}$, which was part of the min-cut.
+
+
+
+Let $C_1, C_2, \dots, C_l$ be min-cuts of graph $G(V,E)$ having size $k$. Karger's fails to find mininum cut $C_i$ precisely when it contracts an edge of $C_i$. Thus Karger's will fail to find all min-cuts when it contracts atleast one edge belonging to each min-cut. 
+
+Let $E_i$ be the event that Karger's Algorithm fails to find cut $C_i$. Let $F$ be the event that Karger's algorithm fails. We have:
+
+$$
+P[F] = P[E_1 \cap E_2 \cap \dots \cap E_l] \leq P[E_i] \text{ for any } i \in {1,2, \dots, l}
+$$
+
+Let's fix our focus on the $j^{th}$ mincut and find $P[E_j]$.
+
+To do so, we use the following lemma:
+
+If a graph $G(V,E)$ has a min-cut size $k$, then $|E| \geq \frac{k|V|}{2}$
+
+We do a proof by contradiction. Assume that $|E| < \frac{k|V|}{2}.
+
+By the handshake lemma, we know $2|E| = \sum_{v \in V} degree(v)$
+
+Thus,  $\sum_{v \in V} degree(v) < k|V|$. 
+
+This implies that there exist atleast one vertex $v \in V$ such that $degree(v) < k$. Consider the cut $S = {v}$, $T = V\S$. This cut has size equal to the degree of v, which is smaller than k, contradicting the fact that $G$ has a min-cut size of $k$.
+--
+
+We find $P[E_j]$ by computing its complement. That is, we compute the probablilty that Karger's algorithm finds the cut $C_j$. Let's denote this event as $S$.
+
+To find the min-cut, Karger's algorithm must not contract any edge belonging to min-cut $C_j$. Let $S_i$ be the event that Karger's does not contract an edge \in $C_j$ on its ith iteration. 
+
+Thus, 
+
+$$
+\begin{aligned}
+P[S] &= P[S_1 \cap S_2 \cap \dots \cap S_{n-1}] \\
+&= P[S_1] \times P[S_2|S_1] \times P[S_3|S_2 \cap S_1] \times \dots \times P[S_{n-1} | S_{n-2} \cap S_{n-3} \cap \dots \cap S_1]
+\end{aligned}
+$$
+
+Let's compute $P[S_i | S_{i-1} \cap S_{i-2} \cap \dots S_{i-1}]$, the probability that Karger's does not contract an edge of min-cut $C_j$ on the ith iteration, given that it has not done that in any of the previous iterations. We write this conditional event as P[A] from now. 
+
+$$
+\begin{alinged}
+P[A] &= 1 - P[\text{contracting a min-cut edge}] \\
+&= 1 - \frac{\text{number of min-cut edges}}{n^{(i)}}
+\end{aligned}
+$$
+Each iteration decreases the number of vertices by exactly one. Thus after $i-1$ iterations, number of vertices = $n - i + 1$.
+
+Since all min-cut edges have survived so far, the min-cut in graph $G^{i}$ has size k, and by our lemma, $n^{i} \geq \frac{k(n - i + 1)}{2}$.
+
+Thus, 
+
+$$
+\begin{aligned}
+P[A] = $P[S_i | S_{i-1} \cap S_{i-2} \cap \dots S_{i-1}] &\geq 1 - \frac{k}{\frac{k(n - i + 1)}{2}} \\
+&= 1 - \frac{2}{n-i+1}
+\end{aligned}
+$$
+
+Thus we can now compute $P[S]$ :
+
+$$
+\begin{aligned}
+P[S] & \geq \prod_{i=1}^{n-2} (1 - \frac{2}{n-i+1}) \\
+& = \frac{2}{n(n-1)}
+\end{aligned}
+$$
+
+
+Thus the probability that Karger's fails to find min-cut $C_j$ is:
+
+$$
+\begin{aligned}
+P[E_i] &= 1 - P[S] \\
+&= 1 - \frac{2}{n(n-1)}
+\end{aligned}
+$$
+
+We use the fact that $1 + x \leq e^x$ for all $x \in \mathbb{R}$, and get:
+
+$$
+\begin{aligned}
+P[E_i] &= 1 - \frac{2}{n(n-1)} \\ 
+\leq e^{\frac{-2}{n(n-1)}}
+\end{aligned}
+$$
+
+Probablility that Karger's fails is then bounded as:
+$$
+\begin{aligned}
+P[F] &\leq P[E_i] \\
+&\leq  e^{\frac{-2}{n(n-1)}}
+\end{aligned}
+$$
+
+What does this mean? For our graph, $n = 5$, so the probability of failure is atmost $e^{\frac{-2}{5(4)} } = e^\frac{-2}{20} \approx 0.91$
+
+That absolutely sucks!
+
+What can we do to get this to a more respectable number? Amplify. 
+
+I want to throw caution here. Amplification only makes sense if we can reduce the probability of failure to our desired number in a quick enough time. For example, in our previous problem, even after amplificatoion, we were significantly faster than the alternative approach.
+
+Will that be the case here? As discussed before, the time complexity of running Karger's algorithm is $O(n)$, it is linear in the number of vertices. As far as graph algorithms go, a time complexity linear in the number of vertices can often be as good as it gets, and asymptotically for the min-cut problem, was until recently strictly faster than any deterministic algorithm for the min-cut!
+
+Say we want to get to a desired upper bound probability of failure $\delta$ and it takes $k$ independent runs of Karger's to get to the bound. Then we have that: 
+
+$$
+\begin{aligned}
+\delta &= e^{\frac{-2k}{n(n-1)}} \\  
+\end{aligned}
+$$
+
+Taking logs on both sides and solving for $k$, we get: 
+
+$$
+\begin{aligned}
+k = \Big \lceil \frac{n(n-1)}{2} \ln\frac{1}{\delta} \Big \rceil  
+\end{aligned}
+$$
+
+To get to a $1 \%$ failure bound (given by \delta = 0.01) for our graph with $n=5$, we will need:
+
+$$
+\begin{aligned}
+k = \Big \lceil \frac{5(5-1)}{2} \ln\frac{1}{0.01} \Big \rceil = 47 iterations 
+\end{aligned}
+$$

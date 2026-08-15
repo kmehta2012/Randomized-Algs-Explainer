@@ -244,6 +244,57 @@ h3 {
   font-size: 0.96rem;
 }
 
+.computer-network {
+  --computer-network-ink: #202020;
+  --computer-network-wire: #817b70;
+
+  margin: 1.5rem 0 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--problem-border);
+  border-bottom: 1px solid var(--problem-border);
+}
+
+.computer-network__canvas {
+  width: min(100%, 36rem);
+  aspect-ratio: 36 / 25;
+  margin-inline: auto;
+}
+
+.computer-network__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.computer-network__wire {
+  stroke: var(--computer-network-wire);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.computer-network__screen {
+  fill: var(--problem-background);
+  stroke: var(--problem-accent);
+  stroke-width: 3;
+}
+
+.computer-network__base {
+  fill: var(--algorithm-background);
+  stroke: var(--computer-network-ink);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.computer-network__label {
+  fill: var(--computer-network-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 750;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
 .edge-contraction {
   --contraction-ink: #202020;
   --contraction-muted: #6f695e;
@@ -282,7 +333,7 @@ h3 {
   display: grid;
   place-items: center;
   width: 100%;
-  aspect-ratio: 5 / 4;
+  aspect-ratio: 36 / 25;
 }
 
 .edge-contraction__canvas svg,
@@ -354,6 +405,10 @@ h3 {
 }
 
 .edge-contraction__label--inside {
+  font-size: 18px;
+}
+
+.edge-contraction__label--supernode {
   font-size: 15px;
 }
 
